@@ -8,6 +8,12 @@ import Index from "./pages/Index";
 import Events from "./pages/Events";
 import Gallery from "./pages/Gallery";
 import NotFound from "./pages/NotFound";
+import AdminLogin from "./pages/AdminLogin";
+import ProtectedRoute from "./components/ProtectedRoute";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminEvents from "./pages/admin/AdminEvents";
+import AdminGallery from "./pages/admin/AdminGallery";
+import AdminCarousel from "./pages/admin/AdminCarousel";
 
 const queryClient = new QueryClient();
 
@@ -18,10 +24,47 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
+          {/* Public Routes */}
           <Route path="/" element={<Index />} />
           <Route path="/events" element={<Events />} />
           <Route path="/gallery" element={<Gallery />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="/admin/login" element={<AdminLogin />} />
+          
+          {/* Protected Admin Routes */}
+          <Route 
+            path="/admin" 
+            element={
+              <ProtectedRoute>
+                <AdminDashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/events" 
+            element={
+              <ProtectedRoute>
+                <AdminEvents />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/gallery" 
+            element={
+              <ProtectedRoute>
+                <AdminGallery />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/carousel" 
+            element={
+              <ProtectedRoute>
+                <AdminCarousel />
+              </ProtectedRoute>
+            } 
+          />
+          
+          {/* Catch-all route for 404 */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
