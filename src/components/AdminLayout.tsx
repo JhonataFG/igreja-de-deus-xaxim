@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { useMobile } from "@/hooks/use-mobile";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -22,7 +22,7 @@ interface AdminLayoutProps {
 const AdminLayout = ({ children, title }: AdminLayoutProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const isMobile = useMobile();
+  const isMobile = useIsMobile();
   const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
 
   const handleLogout = () => {
