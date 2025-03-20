@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -17,50 +17,57 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { supabase } from "@/integrations/supabase/client";
 
-// Mock data for carousel slides
+// Carousel slide interface
 interface CarouselSlide {
   id: string;
   title: string;
   subtitle: string;
   image: string;
-  order: number;
+  order_position: number;
 }
 
-const initialSlides: CarouselSlide[] = [
-  {
-    id: "1",
-    title: "Bem-vindo à Igreja da Paz",
-    subtitle: "Uma comunidade viva de fé, esperança e amor",
-    image: "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=800&auto=format&fit=crop&q=80",
-    order: 1
-  },
-  {
-    id: "2",
-    title: "Cultos aos Domingos",
-    subtitle: "Venha adorar conosco todos os domingos às 10h e 18h",
-    image: "https://images.unsplash.com/photo-1492563817904-5650241d13ed?w=800&auto=format&fit=crop&q=80",
-    order: 2
-  },
-  {
-    id: "3",
-    title: "Ministério Infantil",
-    subtitle: "Ensinando os pequenos no caminho em que devem andar",
-    image: "https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=800&auto=format&fit=crop&q=80",
-    order: 3
-  }
-];
-
 const AdminCarousel = () => {
-  const [slides, setSlides] = useState<CarouselSlide[]>(initialSlides);
+  const [slides, setSlides] = useState<CarouselSlide[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [slideToDelete, setSlideToDelete] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const sortedSlides = [...slides].sort((a, b) => a.order - b.order);
+  useEffect(() => {
+    fetchCarouselSlides();
+  }, []);
+
+  const fetchCarouselSlides = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('carousel')
+        .select('*')
+        .order('order_position', { ascending: true });
+
+      if (error) {
+        throw error;
+      }
+
+      if (data) {
+        setSlides(data as CarouselSlide[]);
+      }
+    } catch (error) {
+      console.error('Error fetching carousel slides:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível carregar os slides do carrossel.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
   
-  const filteredSlides = sortedSlides.filter(slide => 
+  const filteredSlides = slides.filter(slide => 
     slide.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     slide.subtitle.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -70,39 +77,85 @@ const AdminCarousel = () => {
     setIsDeleteDialogOpen(true);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (slideToDelete) {
-      setSlides(slides.filter(slide => slide.id !== slideToDelete));
-      toast({
-        title: "Slide excluído",
-        description: "O slide foi removido do carrossel com sucesso.",
-      });
-      setIsDeleteDialogOpen(false);
-      setSlideToDelete(null);
+      try {
+        const { error } = await supabase
+          .from('carousel')
+          .delete()
+          .eq('id', slideToDelete);
+
+        if (error) {
+          throw error;
+        }
+
+        setSlides(slides.filter(slide => slide.id !== slideToDelete));
+        toast({
+          title: "Slide excluído",
+          description: "O slide foi removido do carrossel com sucesso.",
+        });
+      } catch (error) {
+        console.error('Error deleting slide:', error);
+        toast({
+          title: "Erro",
+          description: "Não foi possível excluir o slide.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsDeleteDialogOpen(false);
+        setSlideToDelete(null);
+      }
     }
   };
 
-  const moveSlide = (id: string, direction: 'up' | 'down') => {
-    const updatedSlides = [...slides];
-    const currentIndex = updatedSlides.findIndex(slide => slide.id === id);
+  const moveSlide = async (id: string, direction: 'up' | 'down') => {
+    const currentIndex = slides.findIndex(slide => slide.id === id);
     
     if (
       (direction === 'up' && currentIndex > 0) ||
-      (direction === 'down' && currentIndex < updatedSlides.length - 1)
+      (direction === 'down' && currentIndex < slides.length - 1)
     ) {
       const newIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
       
-      // Swap the orders
-      const currentOrder = updatedSlides[currentIndex].order;
-      updatedSlides[currentIndex].order = updatedSlides[newIndex].order;
-      updatedSlides[newIndex].order = currentOrder;
-      
-      setSlides(updatedSlides);
-      
-      toast({
-        title: "Ordem atualizada",
-        description: "A ordem dos slides foi atualizada com sucesso.",
-      });
+      try {
+        const currentSlide = slides[currentIndex];
+        const targetSlide = slides[newIndex];
+        
+        // Swap positions in database
+        const updates = [
+          { id: currentSlide.id, order_position: targetSlide.order_position },
+          { id: targetSlide.id, order_position: currentSlide.order_position }
+        ];
+        
+        for (const update of updates) {
+          const { error } = await supabase
+            .from('carousel')
+            .update({ order_position: update.order_position })
+            .eq('id', update.id);
+            
+          if (error) throw error;
+        }
+        
+        // Update local state
+        const updatedSlides = [...slides];
+        const temp = updatedSlides[currentIndex].order_position;
+        updatedSlides[currentIndex].order_position = updatedSlides[newIndex].order_position;
+        updatedSlides[newIndex].order_position = temp;
+        
+        setSlides(updatedSlides.sort((a, b) => a.order_position - b.order_position));
+        
+        toast({
+          title: "Ordem atualizada",
+          description: "A ordem dos slides foi atualizada com sucesso.",
+        });
+      } catch (error) {
+        console.error('Error updating slide order:', error);
+        toast({
+          title: "Erro",
+          description: "Não foi possível atualizar a ordem dos slides.",
+          variant: "destructive",
+        });
+      }
     }
   };
 
@@ -137,7 +190,13 @@ const AdminCarousel = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredSlides.length > 0 ? (
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                    Carregando slides...
+                  </TableCell>
+                </TableRow>
+              ) : filteredSlides.length > 0 ? (
                 filteredSlides.map((slide) => (
                   <TableRow key={slide.id}>
                     <TableCell>
@@ -151,7 +210,7 @@ const AdminCarousel = () => {
                     </TableCell>
                     <TableCell className="font-medium">{slide.title}</TableCell>
                     <TableCell className="text-muted-foreground text-sm">{slide.subtitle}</TableCell>
-                    <TableCell>{slide.order}</TableCell>
+                    <TableCell>{slide.order_position}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1">
                         <Button 
@@ -159,7 +218,7 @@ const AdminCarousel = () => {
                           size="icon" 
                           className="h-8 w-8" 
                           onClick={() => moveSlide(slide.id, 'up')}
-                          disabled={slide.order === 1}
+                          disabled={slide.order_position === Math.min(...slides.map(s => s.order_position))}
                         >
                           <MoveUp className="h-4 w-4" />
                         </Button>
@@ -168,7 +227,7 @@ const AdminCarousel = () => {
                           size="icon" 
                           className="h-8 w-8" 
                           onClick={() => moveSlide(slide.id, 'down')}
-                          disabled={slide.order === slides.length}
+                          disabled={slide.order_position === Math.max(...slides.map(s => s.order_position))}
                         >
                           <MoveDown className="h-4 w-4" />
                         </Button>
