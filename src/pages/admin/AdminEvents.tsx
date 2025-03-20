@@ -1,10 +1,9 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Calendar, Edit, Plus, Search, Trash2 } from "lucide-react";
 import {
@@ -17,52 +16,25 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { useToast } from "@/hooks/use-toast";
-import { EventProps } from "@/components/EventCard";
-import { supabase } from "@/integrations/supabase/client";
+import { useEvents } from "@/hooks/events/use-events";
+import { EventFormValues } from "@/types/event";
+import EventDialog from "@/components/admin/events/EventDialog";
 
 const AdminEvents = () => {
-  const [events, setEvents] = useState<EventProps[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
+  const {
+    loading,
+    searchTerm,
+    setSearchTerm,
+    filteredEvents,
+    createEvent,
+    updateEvent,
+    deleteEvent
+  } = useEvents();
+
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [eventToDelete, setEventToDelete] = useState<string | null>(null);
-  const { toast } = useToast();
-
-  useEffect(() => {
-    fetchEvents();
-  }, []);
-
-  const fetchEvents = async () => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from('events')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        throw error;
-      }
-
-      if (data) {
-        setEvents(data as EventProps[]);
-      }
-    } catch (error) {
-      console.error('Error fetching events:', error);
-      toast({
-        title: "Erro",
-        description: "Não foi possível carregar os eventos.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const filteredEvents = events.filter(event => 
-    event.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const [isEventDialogOpen, setIsEventDialogOpen] = useState(false);
+  const [editingEvent, setEditingEvent] = useState<string | null>(null);
 
   const handleDeleteClick = (id: string) => {
     setEventToDelete(id);
@@ -71,32 +43,29 @@ const AdminEvents = () => {
 
   const confirmDelete = async () => {
     if (eventToDelete) {
-      try {
-        const { error } = await supabase
-          .from('events')
-          .delete()
-          .eq('id', eventToDelete);
-
-        if (error) {
-          throw error;
-        }
-
-        setEvents(events.filter(event => event.id !== eventToDelete));
-        toast({
-          title: "Evento excluído",
-          description: "O evento foi removido com sucesso.",
-        });
-      } catch (error) {
-        console.error('Error deleting event:', error);
-        toast({
-          title: "Erro",
-          description: "Não foi possível excluir o evento.",
-          variant: "destructive",
-        });
-      } finally {
+      const success = await deleteEvent(eventToDelete);
+      if (success) {
         setIsDeleteDialogOpen(false);
         setEventToDelete(null);
       }
+    }
+  };
+
+  const handleEditClick = (id: string) => {
+    setEditingEvent(id);
+    setIsEventDialogOpen(true);
+  };
+
+  const handleAddNewClick = () => {
+    setEditingEvent(null);
+    setIsEventDialogOpen(true);
+  };
+
+  const handleEventSubmit = async (values: EventFormValues) => {
+    if (editingEvent) {
+      return await updateEvent(editingEvent, values);
+    } else {
+      return await createEvent(values);
     }
   };
 
@@ -112,7 +81,7 @@ const AdminEvents = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <Button>
+        <Button onClick={handleAddNewClick}>
           <Plus className="mr-2 h-4 w-4" />
           Novo Evento
         </Button>
@@ -149,7 +118,12 @@ const AdminEvents = () => {
                     <TableCell>{event.location}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-8 w-8"
+                          onClick={() => handleEditClick(event.id)}
+                        >
                           <Edit className="h-4 w-4" />
                         </Button>
                         <Button 
@@ -192,6 +166,14 @@ const AdminEvents = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <EventDialog
+        isOpen={isEventDialogOpen}
+        onOpenChange={setIsEventDialogOpen}
+        onSubmit={handleEventSubmit}
+        event={editingEvent ? filteredEvents.find(e => e.id === editingEvent) : undefined}
+        title={editingEvent ? "Editar Evento" : "Novo Evento"}
+      />
     </AdminLayout>
   );
 };

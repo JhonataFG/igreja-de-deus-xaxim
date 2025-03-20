@@ -1,0 +1,147 @@
+
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { EventFormValues } from "@/types/event";
+
+const formSchema = z.object({
+  title: z.string().min(3, "O título deve ter pelo menos 3 caracteres"),
+  date: z.string().min(1, "A data é obrigatória"),
+  time: z.string().min(1, "O horário é obrigatório"),
+  location: z.string().min(1, "O local é obrigatório"),
+  description: z.string().min(10, "A descrição deve ter pelo menos 10 caracteres"),
+  image: z.string().url("Insira uma URL válida para a imagem"),
+});
+
+interface EventFormProps {
+  defaultValues?: EventFormValues;
+  onSubmit: (values: EventFormValues) => void;
+  isSubmitting: boolean;
+}
+
+const EventForm = ({ defaultValues, onSubmit, isSubmitting }: EventFormProps) => {
+  const form = useForm<EventFormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: defaultValues || {
+      title: "",
+      date: "",
+      time: "",
+      location: "",
+      description: "",
+      image: "",
+    },
+  });
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="title"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Título</FormLabel>
+              <FormControl>
+                <Input placeholder="Título do evento" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="date"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Data</FormLabel>
+                <FormControl>
+                  <Input placeholder="DD/MM/YYYY" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="time"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Horário</FormLabel>
+                <FormControl>
+                  <Input placeholder="HH:MM - HH:MM" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <FormField
+          control={form.control}
+          name="location"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Local</FormLabel>
+              <FormControl>
+                <Input placeholder="Local do evento" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="image"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>URL da Imagem</FormLabel>
+              <FormControl>
+                <Input placeholder="https://exemplo.com/imagem.jpg" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Descrição</FormLabel>
+              <FormControl>
+                <Textarea 
+                  placeholder="Descreva o evento" 
+                  rows={5}
+                  {...field} 
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? "Salvando..." : defaultValues ? "Atualizar Evento" : "Criar Evento"}
+        </Button>
+      </form>
+    </Form>
+  );
+};
+
+export default EventForm;

@@ -4,20 +4,27 @@ import AdminLayout from "@/components/AdminLayout";
 import CarouselHeader from "@/components/admin/carousel/CarouselHeader";
 import CarouselTable from "@/components/admin/carousel/CarouselTable";
 import DeleteSlideDialog from "@/components/admin/carousel/DeleteSlideDialog";
+import CarouselDialog from "@/components/admin/carousel/CarouselDialog";
 import { useCarouselSlides } from "@/hooks/carousel/use-carousel-slides";
+import { CarouselFormValues } from "@/components/admin/carousel/CarouselForm";
 
 const AdminCarousel = () => {
   const { 
     loading, 
     searchTerm, 
     setSearchTerm, 
-    filteredSlides, 
+    filteredSlides,
+    maxOrderPosition, 
     deleteSlide, 
-    moveSlide 
+    moveSlide,
+    createSlide,
+    updateSlide
   } = useCarouselSlides();
   
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [slideToDelete, setSlideToDelete] = useState<string | null>(null);
+  const [isCarouselDialogOpen, setIsCarouselDialogOpen] = useState(false);
+  const [editingSlide, setEditingSlide] = useState<string | null>(null);
 
   const handleDeleteClick = (id: string) => {
     setSlideToDelete(id);
@@ -35,13 +42,21 @@ const AdminCarousel = () => {
   };
 
   const handleEditClick = (id: string) => {
-    // Edit functionality will be implemented later
-    console.log("Edit slide:", id);
+    setEditingSlide(id);
+    setIsCarouselDialogOpen(true);
   };
 
   const handleAddNewClick = () => {
-    // Add new slide functionality will be implemented later
-    console.log("Add new slide");
+    setEditingSlide(null);
+    setIsCarouselDialogOpen(true);
+  };
+
+  const handleCarouselSubmit = async (values: CarouselFormValues) => {
+    if (editingSlide) {
+      return await updateSlide(editingSlide, values);
+    } else {
+      return await createSlide(values);
+    }
   };
 
   return (
@@ -64,6 +79,15 @@ const AdminCarousel = () => {
         isOpen={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
         onConfirm={confirmDelete}
+      />
+
+      <CarouselDialog
+        isOpen={isCarouselDialogOpen}
+        onOpenChange={setIsCarouselDialogOpen}
+        onSubmit={handleCarouselSubmit}
+        slide={editingSlide ? filteredSlides.find(s => s.id === editingSlide) : undefined}
+        title={editingSlide ? "Editar Slide" : "Novo Slide"}
+        maxPosition={maxOrderPosition}
       />
     </AdminLayout>
   );

@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { CarouselSlide } from "@/types/carousel";
+import { CarouselFormValues } from "@/components/admin/carousel/CarouselForm";
 
 export const useCarouselSlides = () => {
   const [slides, setSlides] = useState<CarouselSlide[]>([]);
@@ -34,6 +35,69 @@ export const useCarouselSlides = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const createSlide = async (values: CarouselFormValues) => {
+    try {
+      const { data, error } = await supabase
+        .from('carousel')
+        .insert([values])
+        .select();
+
+      if (error) {
+        throw error;
+      }
+
+      if (data) {
+        await fetchCarouselSlides(); // Recarrega tudo para garantir a ordem correta
+        toast({
+          title: "Slide criado",
+          description: "O slide foi adicionado ao carrossel com sucesso.",
+        });
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Error creating slide:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível criar o slide.",
+        variant: "destructive",
+      });
+      return false;
+    }
+  };
+
+  const updateSlide = async (id: string, values: CarouselFormValues) => {
+    try {
+      const { data, error } = await supabase
+        .from('carousel')
+        .update(values)
+        .eq('id', id)
+        .select();
+
+      if (error) {
+        throw error;
+      }
+
+      if (data) {
+        await fetchCarouselSlides(); // Recarrega tudo para garantir a ordem correta
+        toast({
+          title: "Slide atualizado",
+          description: "O slide foi atualizado com sucesso.",
+        });
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Error updating slide:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível atualizar o slide.",
+        variant: "destructive",
+      });
+      return false;
     }
   };
 
@@ -131,6 +195,11 @@ export const useCarouselSlides = () => {
     );
   };
 
+  const getMaxOrderPosition = () => {
+    if (slides.length === 0) return 0;
+    return Math.max(...slides.map(slide => slide.order_position));
+  };
+
   useEffect(() => {
     fetchCarouselSlides();
   }, []);
@@ -141,7 +210,10 @@ export const useCarouselSlides = () => {
     searchTerm,
     setSearchTerm,
     filteredSlides: getFilteredSlides(),
+    maxOrderPosition: getMaxOrderPosition(),
     fetchCarouselSlides,
+    createSlide,
+    updateSlide,
     deleteSlide,
     moveSlide
   };

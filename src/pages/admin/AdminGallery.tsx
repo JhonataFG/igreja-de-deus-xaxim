@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,52 +16,27 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { GalleryItemProps } from "@/components/GalleryItem";
-import { supabase } from "@/integrations/supabase/client";
+import { useGallery } from "@/hooks/gallery/use-gallery";
+import { GalleryFormValues } from "@/types/gallery";
+import GalleryDialog from "@/components/admin/gallery/GalleryDialog";
 
 const AdminGallery = () => {
-  const [galleryItems, setGalleryItems] = useState<GalleryItemProps[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
+  const {
+    loading,
+    searchTerm,
+    setSearchTerm,
+    filteredGalleryItems,
+    categories,
+    createGalleryItem,
+    updateGalleryItem,
+    deleteGalleryItem
+  } = useGallery();
+
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
+  const [isGalleryDialogOpen, setIsGalleryDialogOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState<string | null>(null);
   const { toast } = useToast();
-
-  useEffect(() => {
-    fetchGalleryItems();
-  }, []);
-
-  const fetchGalleryItems = async () => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from('gallery')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        throw error;
-      }
-
-      if (data) {
-        setGalleryItems(data as GalleryItemProps[]);
-      }
-    } catch (error) {
-      console.error('Error fetching gallery items:', error);
-      toast({
-        title: "Erro",
-        description: "Não foi possível carregar os itens da galeria.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const filteredItems = galleryItems.filter(item => 
-    item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.category.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   const handleDeleteClick = (id: string) => {
     setItemToDelete(id);
@@ -70,32 +45,29 @@ const AdminGallery = () => {
 
   const confirmDelete = async () => {
     if (itemToDelete) {
-      try {
-        const { error } = await supabase
-          .from('gallery')
-          .delete()
-          .eq('id', itemToDelete);
-
-        if (error) {
-          throw error;
-        }
-
-        setGalleryItems(galleryItems.filter(item => item.id !== itemToDelete));
-        toast({
-          title: "Item excluído",
-          description: "O item foi removido da galeria com sucesso.",
-        });
-      } catch (error) {
-        console.error('Error deleting gallery item:', error);
-        toast({
-          title: "Erro",
-          description: "Não foi possível excluir o item da galeria.",
-          variant: "destructive",
-        });
-      } finally {
+      const success = await deleteGalleryItem(itemToDelete);
+      if (success) {
         setIsDeleteDialogOpen(false);
         setItemToDelete(null);
       }
+    }
+  };
+
+  const handleEditClick = (id: string) => {
+    setEditingItem(id);
+    setIsGalleryDialogOpen(true);
+  };
+
+  const handleAddNewClick = () => {
+    setEditingItem(null);
+    setIsGalleryDialogOpen(true);
+  };
+
+  const handleGallerySubmit = async (values: GalleryFormValues) => {
+    if (editingItem) {
+      return await updateGalleryItem(editingItem, values);
+    } else {
+      return await createGalleryItem(values);
     }
   };
 
@@ -111,7 +83,7 @@ const AdminGallery = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <Button>
+        <Button onClick={handleAddNewClick}>
           <Plus className="mr-2 h-4 w-4" />
           Nova Imagem
         </Button>
@@ -125,8 +97,8 @@ const AdminGallery = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredItems.length > 0 ? (
-                filteredItems.map((item) => (
+              {filteredGalleryItems.length > 0 ? (
+                filteredGalleryItems.map((item) => (
                   <div key={item.id} className="relative group overflow-hidden rounded-lg border bg-card shadow-sm">
                     <div className="aspect-square overflow-hidden">
                       <img 
@@ -146,7 +118,12 @@ const AdminGallery = () => {
                       <p className="text-sm text-muted-foreground line-clamp-2">{item.description}</p>
                     </div>
                     <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Button variant="secondary" size="icon" className="h-8 w-8 rounded-full bg-white/80 backdrop-blur-sm shadow-sm">
+                      <Button 
+                        variant="secondary" 
+                        size="icon" 
+                        className="h-8 w-8 rounded-full bg-white/80 backdrop-blur-sm shadow-sm"
+                        onClick={() => handleEditClick(item.id)}
+                      >
                         <Edit className="h-4 w-4" />
                       </Button>
                       <Button 
@@ -186,6 +163,15 @@ const AdminGallery = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <GalleryDialog
+        isOpen={isGalleryDialogOpen}
+        onOpenChange={setIsGalleryDialogOpen}
+        onSubmit={handleGallerySubmit}
+        item={editingItem ? filteredGalleryItems.find(i => i.id === editingItem) : undefined}
+        title={editingItem ? "Editar Imagem" : "Nova Imagem"}
+        categories={categories}
+      />
     </AdminLayout>
   );
 };
