@@ -1,6 +1,8 @@
 
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+/* @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap'); */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
+/* Seu código CSS Tailwind aqui */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -16,11 +18,17 @@
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 3.9%;
 
-    --primary: #e99109;
-    --primary-foreground: #e99109AA;
+    --primary: 12	82%	56%;
+    --primary-foreground: 0 0% 100%;
+  
+    --secondary: 212	80%	27%;
+    --secondary-foreground: 0 0% 100%;
 
-    --secondary: #0a497d;
-    --secondary-foreground: #0a497dAA;
+    --tertiary: 36	89%	47%;
+    --tertiary-foreground: 0 0% 100%;
+
+    --quaternary: 175	83%	36%;
+    --quaternary-foreground: 0 0% 100%;
 
     --muted: 240 4.8% 95.9%;
     --muted-foreground: 240 3.8% 46.1%;

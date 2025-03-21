@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
@@ -31,38 +30,62 @@ const Navbar = () => {
   };
 
   return (
-    <header className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ease-in-out ${isScrolled ? "bg-white/95 backdrop-blur-sm shadow-md" : "bg-transparent"}`}>
+    <header
+      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ease-in-out ${
+        isScrolled || !isActivePath("/") ? "bg-white/95 backdrop-blur-sm shadow-md" : "bg-transparent"
+      }`}
+    >
       <nav className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
-          <Link to="/" className="flex items-center space-x-2" onClick={closeMobileMenu}>
-            <span className={`font-serif text-2xl font-bold ${isScrolled ? "text-primary" : "text-white"}`}>
-              Igreja de Deus Xaxim
-            </span>
+          <Link to="/" className="flex items-center space-x-2 " onClick={closeMobileMenu}>
+            <img src="/id_xaxim_1.JPG" alt="Logo Igreja de Deus Xaxim" className="w-16 h-16 rounded-full" />
+            <div className="flex flex-col">
+              <span
+                className={`font-serif text-lg font-bold ${
+                  isScrolled || !isActivePath("/") ? "text-primary" : "text-white"
+                }`}
+              >
+                IGREJA DE DEUS
+              </span>
+              <div
+                className={`text-center -m-1 font-serif text-sm font-sm ${
+                  isScrolled || !isActivePath("/") ? "text-primary" : "text-white"
+                }`}
+              >
+                XAXIM
+              </div>
+            </div>
           </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link 
-              to="/" 
-              className={`navbar-link text-sm font-medium ${isScrolled ? 'text-foreground/80' : 'text-white/90'} ${isActivePath('/') ? 'after:scale-x-100 font-medium' : ''}`}
+            <Link
+              to="/"
+              className={`navbar-link text-lg font-medium ${
+                isScrolled || !isActivePath("/") ? "text-foreground/80" : "text-white/90"
+              } ${isActivePath("/") ? "after:scale-x-100 font-medium" : ""}`}
             >
               Início
             </Link>
-            <Link 
-              to="/events" 
-              className={`navbar-link text-sm font-medium ${isScrolled ? 'text-foreground/80' : 'text-white/90'} ${isActivePath('/events') ? 'after:scale-x-100 font-medium' : ''}`}
+            <Link
+              to="/events"
+              className={`navbar-link text-lg font-medium ${
+                isScrolled || !isActivePath("/") ? "text-foreground/80" : "text-white/90"
+              } ${isActivePath("/events") ? "after:scale-x-100 font-medium" : ""}`}
             >
               Eventos
             </Link>
-            <Link 
-              to="/gallery" 
-              className={`navbar-link text-sm font-medium ${isScrolled ? 'text-foreground/80' : 'text-white/90'} ${isActivePath('/gallery') ? 'after:scale-x-100 font-medium' : ''}`}
+            <Link
+              to="/gallery"
+              className={`navbar-link text-lg font-medium ${
+                isScrolled || !isActivePath("/") ? "text-foreground/80" : "text-white/90"
+              } ${isActivePath("/gallery") ? "after:scale-x-100 font-medium" : ""}`}
             >
               Galeria
             </Link>
-            <Button 
-              variant="outline" 
-              className={`ml-4 ${isScrolled ? 'border-primary text-primary hover:bg-primary hover:text-white' : 'border-white text-white hover:bg-white hover:text-primary'}`}
+            <Button
+              variant="outline"
+              className={`ml-4 ${"border-muted text-primary hover:bg-primary hover:text-white"}`}
             >
               Contato
             </Button>
@@ -75,9 +98,9 @@ const Navbar = () => {
             aria-label="Toggle menu"
           >
             {isMobileMenuOpen ? (
-              <X className={`h-6 w-6 ${isScrolled ? 'text-primary' : 'text-white'}`} />
+              <X className={`h-6 w-6 ${isScrolled ? "text-primary" : "text-white"}`} />
             ) : (
-              <Menu className={`h-6 w-6 ${isScrolled ? 'text-primary' : 'text-white'}`} />
+              <Menu className={`h-6 w-6 ${isScrolled ? "text-primary" : "text-white"}`} />
             )}
           </button>
         </div>
@@ -110,8 +133,8 @@ const Navbar = () => {
             >
               Galeria
             </Link>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="border-primary text-primary hover:bg-primary hover:text-white"
             >
               Contato

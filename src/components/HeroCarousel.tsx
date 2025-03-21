@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -15,7 +14,7 @@ const slides: Slide[] = [
     id: 1,
     image: "https://images.unsplash.com/photo-1438032005730-c779502df39b?w=1200&auto=format&fit=crop&q=80",
     title: "Bem-vindo à Igreja de Deus Xaxim",
-    subtitle: "Um lugar para encontrar fé, esperança e amor",
+    subtitle: "Um lugar para amar e servir",
   },
   {
     id: 2,
@@ -38,10 +37,10 @@ const HeroCarousel = () => {
 
   const nextSlide = useCallback(() => {
     if (isTransitioning) return;
-    
+
     setIsTransitioning(true);
     setCurrentSlide((prev) => (prev === totalSlides - 1 ? 0 : prev + 1));
-    
+
     setTimeout(() => {
       setIsTransitioning(false);
     }, 600);
@@ -49,10 +48,10 @@ const HeroCarousel = () => {
 
   const prevSlide = useCallback(() => {
     if (isTransitioning) return;
-    
+
     setIsTransitioning(true);
     setCurrentSlide((prev) => (prev === 0 ? totalSlides - 1 : prev - 1));
-    
+
     setTimeout(() => {
       setIsTransitioning(false);
     }, 600);
@@ -83,15 +82,15 @@ const HeroCarousel = () => {
             loading={index === 0 ? "eager" : "lazy"}
           />
           <div className="absolute inset-0 z-20 flex flex-col items-center justify-center px-4 sm:px-6">
-            <div className={`text-center max-w-3xl mx-auto transition-all duration-700 ${
-              index === currentSlide ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-            }`}>
+            <div
+              className={`text-center max-w-3xl mx-auto transition-all duration-700 ${
+                index === currentSlide ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+              }`}
+            >
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-white mb-4 tracking-tight">
                 {slide.title}
               </h1>
-              <p className="text-xl md:text-2xl text-white/90 mb-8">
-                {slide.subtitle}
-              </p>
+              <p className="text-xl md:text-2xl text-white/90 mb-8">{slide.subtitle}</p>
               <Button className="bg-white text-primary hover:bg-white/90 hover:text-primary/90 transition-all">
                 Saiba Mais
               </Button>

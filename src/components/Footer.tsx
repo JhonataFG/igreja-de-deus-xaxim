@@ -1,4 +1,3 @@
-
 import { Facebook, Instagram, Mail, MapPin, Phone } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -12,7 +11,7 @@ const Footer = () => {
           <div className="space-y-4">
             <h3 className="text-xl font-serif font-semibold">Igreja de Deus Xaxim</h3>
             <p className="text-white/80 max-w-xs">
-              Um lugar de paz, amor e comunhão. Venha fazer parte da nossa família e crescer na fé.
+              Um lugar para amar e servir. Venha fazer parte da nossa família e crescer na fé.
             </p>
             <div className="flex space-x-4 pt-2">
               <a href="#" className="text-white/80 hover:text-white transition-colors">
@@ -21,12 +20,15 @@ const Footer = () => {
               <a href="#" className="text-white/80 hover:text-white transition-colors">
                 <Instagram className="h-5 w-5" />
               </a>
-              <a href="mailto:contato@igrejadapaz.com" className="text-white/80 hover:text-white transition-colors">
+              <a
+                href="mailto:contato@igrejadapaz.com"
+                className="text-white/80 hover:text-white transition-colors"
+              >
                 <Mail className="h-5 w-5" />
               </a>
             </div>
           </div>
-          
+
           <div className="space-y-4">
             <h3 className="text-xl font-serif font-semibold">Menu Rápido</h3>
             <nav className="flex flex-col space-y-2">
@@ -47,15 +49,17 @@ const Footer = () => {
               </a>
             </nav>
           </div>
-          
+
           <div className="space-y-4">
             <h3 className="text-xl font-serif font-semibold">Contato</h3>
             <div className="space-y-3">
               <div className="flex items-start">
                 <MapPin className="h-5 w-5 mr-2 flex-shrink-0 mt-0.5" />
                 <span className="text-white/80">
-                  Rua dos Fiéis, 123<br />
-                  Bairro Esperança<br />
+                  Rua dos Fiéis, 123
+                  <br />
+                  Bairro Esperança
+                  <br />
                   São Paulo - SP
                 </span>
               </div>
@@ -70,7 +74,7 @@ const Footer = () => {
             </div>
           </div>
         </div>
-        
+
         <div className="border-t border-white/20 mt-10 pt-6 text-center text-sm text-white/60">
           <p>© {currentYear} Igreja de Deus Xaxim. Todos os direitos reservados.</p>
         </div>
