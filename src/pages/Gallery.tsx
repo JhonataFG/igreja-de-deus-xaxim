@@ -2,80 +2,15 @@
 import { useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import GalleryItem, { GalleryItemProps } from "@/components/GalleryItem";
+import GalleryItem from "@/components/GalleryItem";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
-
-const galleryItems: GalleryItemProps[] = [
-  {
-    id: "1",
-    title: "Culto de Páscoa",
-    description: "Celebração especial do Domingo de Páscoa, com apresentações do coral e encenação da ressurreição de Jesus.",
-    category: "Celebrações",
-    image: "https://images.unsplash.com/photo-1544427920-c49ccfb85579?w=600&auto=format&fit=crop&q=80"
-  },
-  {
-    id: "2",
-    title: "Retiro de Jovens",
-    description: "Jovens da igreja participando de atividades ao ar livre, estudos bíblicos e momentos de adoração durante o retiro anual.",
-    category: "Jovens",
-    image: "https://images.unsplash.com/photo-1523986490752-c28064f26be3?w=600&auto=format&fit=crop&q=80"
-  },
-  {
-    id: "3",
-    title: "Ação Social na Comunidade",
-    description: "Membros da igreja servindo a comunidade local com distribuição de alimentos, roupas e assistência às famílias necessitadas.",
-    category: "Ação Social",
-    image: "https://images.unsplash.com/photo-1593113646773-028c64a8f1b8?w=600&auto=format&fit=crop&q=80"
-  },
-  {
-    id: "4",
-    title: "Culto de Adoração",
-    description: "Momento de louvor e adoração durante o culto dominical, com a participação da banda e do ministério de louvor da igreja.",
-    category: "Celebrações",
-    image: "https://images.unsplash.com/photo-1442504028989-ab58b5f29a4a?w=600&auto=format&fit=crop&q=80"
-  },
-  {
-    id: "5",
-    title: "Batismo",
-    description: "Cerimônia de batismo realizada no rio, simbolizando o novo nascimento e compromisso com Cristo.",
-    category: "Sacramentos",
-    image: "https://images.unsplash.com/photo-1576009485754-588f6c28aa18?w=600&auto=format&fit=crop&q=80"
-  },
-  {
-    id: "6",
-    title: "Escola Bíblica Dominical",
-    description: "Crianças participando das atividades da Escola Bíblica Dominical, aprendendo sobre as histórias bíblicas de forma lúdica e interativa.",
-    category: "Educação",
-    image: "https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=600&auto=format&fit=crop&q=80"
-  },
-  {
-    id: "7",
-    title: "Natal na Igreja",
-    description: "Decoração especial e apresentação do coral durante a celebração de Natal, com encenação do nascimento de Jesus.",
-    category: "Celebrações",
-    image: "https://images.unsplash.com/photo-1576349597974-0cf2419b3fe0?w=600&auto=format&fit=crop&q=80"
-  },
-  {
-    id: "8",
-    title: "Grupo de Oração",
-    description: "Membros da igreja reunidos em um círculo de oração, intercedendo uns pelos outros e pelas necessidades da comunidade.",
-    category: "Oração",
-    image: "https://images.unsplash.com/photo-1476041800959-2f6bb412c8ce?w=600&auto=format&fit=crop&q=80"
-  },
-  {
-    id: "9",
-    title: "Nova Sede da Igreja",
-    description: "Inauguração da nova sede da Igreja de Deus Xaxim, um marco importante na história da nossa comunidade.",
-    category: "Instalações",
-    image: "https://images.unsplash.com/photo-1526639194900-7ad2dff8afd4?w=600&auto=format&fit=crop&q=80"
-  }
-];
-
-const categories = ["Todos", ...new Set(galleryItems.map(item => item.category))];
+import { usePublicGallery } from "@/hooks/gallery/use-public-gallery";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Gallery = () => {
+  const { galleryItems, categories, loading } = usePublicGallery();
   const [searchTerm, setSearchTerm] = useState("");
   const [activeCategory, setActiveCategory] = useState("Todos");
 
@@ -87,6 +22,8 @@ const Gallery = () => {
     
     return matchesSearch && matchesCategory;
   });
+
+  const allCategories = ["Todos", ...categories];
 
   return (
     <>
@@ -108,7 +45,11 @@ const Gallery = () => {
           <div className="container mx-auto px-4">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
               <div className="flex overflow-x-auto pb-3 md:pb-0 hide-scrollbar md:flex-wrap gap-2">
-                {categories.map((category) => (
+                {loading ? (
+                  [1, 2, 3, 4].map((item) => (
+                    <Skeleton key={item} className="h-10 w-24" />
+                  ))
+                ) : allCategories.map((category) => (
                   <Button
                     key={category}
                     variant={activeCategory === category ? "default" : "outline"}
@@ -132,16 +73,27 @@ const Gallery = () => {
               </div>
             </div>
             
-            {filteredItems.length > 0 ? (
+            {loading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[1, 2, 3, 4, 5, 6].map((item) => (
+                  <Skeleton key={item} className="aspect-square rounded-xl" />
+                ))}
+              </div>
+            ) : filteredItems.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredItems.map((item) => (
                   <GalleryItem key={item.id} {...item} />
                 ))}
               </div>
-            ) : (
+            ) : galleryItems.length > 0 ? (
               <div className="text-center py-12">
                 <h3 className="text-xl font-medium mb-2">Nenhuma imagem encontrada</h3>
                 <p className="text-muted-foreground">Tente outro termo de busca ou categoria</p>
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <h3 className="text-xl font-medium mb-2">Não há imagens cadastradas</h3>
+                <p className="text-muted-foreground">Entre no painel administrativo para adicionar itens à galeria.</p>
               </div>
             )}
           </div>

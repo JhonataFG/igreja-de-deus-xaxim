@@ -1,45 +1,17 @@
+
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import HeroCarousel from "@/components/HeroCarousel";
-import EventCard, { EventProps } from "@/components/EventCard";
+import EventCard from "@/components/EventCard";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
-
-const featuredEvents: EventProps[] = [
-  {
-    id: "1",
-    title: "Culto de Louvor e Adoração",
-    date: "26/10/2023",
-    time: "19:00 - 21:00",
-    location: "Templo Principal",
-    description:
-      "Um momento especial de adoração e comunhão com Deus. Venha participar deste tempo maravilhoso de louvor e adoração.",
-    image: "https://images.unsplash.com/photo-1438032005730-c779502df39b?w=600&auto=format&fit=crop&q=80",
-  },
-  {
-    id: "2",
-    title: "Encontro de Jovens",
-    date: "28/10/2023",
-    time: "18:00 - 21:30",
-    location: "Salão de Eventos",
-    description:
-      "Um encontro dinâmico para jovens com música, mensagem bíblica e muita diversão. Traga seus amigos!",
-    image: "https://images.unsplash.com/photo-1523803326055-13179de6cc78?w=600&auto=format&fit=crop&q=80",
-  },
-  {
-    id: "3",
-    title: "Estudo Bíblico Semanal",
-    date: "30/10/2023",
-    time: "19:30 - 21:00",
-    location: "Sala de Estudos",
-    description:
-      "Aprofunde seu conhecimento da Palavra de Deus em nosso estudo bíblico semanal. Todos são bem-vindos.",
-    image: "https://images.unsplash.com/photo-1504052434569-70ad5836ab65?w=600&auto=format&fit=crop&q=80",
-  },
-];
+import { usePublicEvents } from "@/hooks/events/use-public-events";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Index = () => {
+  const { events, loading } = usePublicEvents(3); // Limitando a 3 eventos
+
   return (
     <>
       <Navbar />
@@ -82,15 +54,38 @@ const Index = () => {
               </Link>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {featuredEvents.map((event) => (
-                <EventCard key={event.id} event={event} />
-              ))}
-            </div>
+            {loading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {[1, 2, 3].map((item) => (
+                  <div key={item} className="flex flex-col h-full rounded-xl overflow-hidden">
+                    <Skeleton className="h-48 w-full" />
+                    <div className="p-5 bg-white">
+                      <Skeleton className="h-6 w-3/4 mb-2" />
+                      <Skeleton className="h-4 w-full mb-4" />
+                      <Skeleton className="h-4 w-2/3 mb-2" />
+                      <Skeleton className="h-4 w-3/4 mb-6" />
+                      <Skeleton className="h-10 w-full" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : events.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {events.map((event) => (
+                  <EventCard key={event.id} event={event} />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12 bg-white/5 rounded-lg">
+                <h3 className="text-xl font-medium mb-2 text-white">Não há eventos cadastrados</h3>
+                <p className="text-white/70">Entre no painel administrativo para adicionar eventos.</p>
+              </div>
+            )}
           </div>
         </section>
 
         <section className="py-16 bg-white">
+          {/* ...  manter o restante do código existente (seção "Como Podemos Servir Você") */}
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto text-center mb-8">
               <span className="text-primary text-sm font-medium uppercase tracking-wider">

@@ -2,69 +2,15 @@
 import { useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import EventCard, { EventProps } from "@/components/EventCard";
+import EventCard from "@/components/EventCard";
 import { Button } from "@/components/ui/button";
 import { Calendar, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
-
-const events: EventProps[] = [
-  {
-    id: "1",
-    title: "Culto de Louvor e Adoração",
-    date: "26/10/2023",
-    time: "19:00 - 21:00",
-    location: "Templo Principal",
-    description: "Um momento especial de adoração e comunhão com Deus. Venha participar deste tempo maravilhoso de louvor e adoração.",
-    image: "https://images.unsplash.com/photo-1438032005730-c779502df39b?w=600&auto=format&fit=crop&q=80"
-  },
-  {
-    id: "2",
-    title: "Encontro de Jovens",
-    date: "28/10/2023",
-    time: "18:00 - 21:30",
-    location: "Salão de Eventos",
-    description: "Um encontro dinâmico para jovens com música, mensagem bíblica e muita diversão. Traga seus amigos!",
-    image: "https://images.unsplash.com/photo-1523803326055-13179de6cc78?w=600&auto=format&fit=crop&q=80"
-  },
-  {
-    id: "3",
-    title: "Estudo Bíblico Semanal",
-    date: "30/10/2023",
-    time: "19:30 - 21:00",
-    location: "Sala de Estudos",
-    description: "Aprofunde seu conhecimento da Palavra de Deus em nosso estudo bíblico semanal. Todos são bem-vindos.",
-    image: "https://images.unsplash.com/photo-1504052434569-70ad5836ab65?w=600&auto=format&fit=crop&q=80"
-  },
-  {
-    id: "4",
-    title: "Café das Mulheres",
-    date: "02/11/2023",
-    time: "15:00 - 17:00",
-    location: "Salão Social",
-    description: "Um momento especial de comunhão, compartilhamento e crescimento espiritual para as mulheres da igreja.",
-    image: "https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=600&auto=format&fit=crop&q=80"
-  },
-  {
-    id: "5",
-    title: "Culto de Oração",
-    date: "03/11/2023",
-    time: "06:00 - 07:30",
-    location: "Capela",
-    description: "Venha começar o dia em oração! Um momento poderoso de intercessão e busca da presença de Deus.",
-    image: "https://images.unsplash.com/photo-1476041800959-2f6bb412c8ce?w=600&auto=format&fit=crop&q=80"
-  },
-  {
-    id: "6",
-    title: "Encontro de Casais",
-    date: "05/11/2023",
-    time: "19:00 - 21:30",
-    location: "Centro de Convenções",
-    description: "Uma noite especial para fortalecer relacionamentos conjugais baseados nos princípios bíblicos.",
-    image: "https://images.unsplash.com/photo-1529634597503-139d3726fed5?w=600&auto=format&fit=crop&q=80"
-  }
-];
+import { usePublicEvents } from "@/hooks/events/use-public-events";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Events = () => {
+  const { events, loading } = usePublicEvents();
   const [searchTerm, setSearchTerm] = useState("");
 
   const filteredEvents = events.filter(event => 
@@ -110,18 +56,38 @@ const Events = () => {
               </div>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredEvents.length > 0 ? (
-                filteredEvents.map((event) => (
+            {loading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {[1, 2, 3, 4, 5, 6].map((item) => (
+                  <div key={item} className="flex flex-col h-full rounded-xl overflow-hidden">
+                    <Skeleton className="h-48 w-full" />
+                    <div className="p-5">
+                      <Skeleton className="h-6 w-3/4 mb-2" />
+                      <Skeleton className="h-4 w-full mb-4" />
+                      <Skeleton className="h-4 w-2/3 mb-2" />
+                      <Skeleton className="h-4 w-3/4 mb-6" />
+                      <Skeleton className="h-10 w-full" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : filteredEvents.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {filteredEvents.map((event) => (
                   <EventCard key={event.id} event={event} />
-                ))
-              ) : (
-                <div className="col-span-full text-center py-8">
-                  <h3 className="text-xl font-medium mb-2">Nenhum evento encontrado</h3>
-                  <p className="text-muted-foreground">Tente outro termo de busca</p>
-                </div>
-              )}
-            </div>
+                ))}
+              </div>
+            ) : events.length > 0 ? (
+              <div className="col-span-full text-center py-8">
+                <h3 className="text-xl font-medium mb-2">Nenhum evento encontrado</h3>
+                <p className="text-muted-foreground">Tente outro termo de busca</p>
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <h3 className="text-xl font-medium mb-2">Não há eventos cadastrados</h3>
+                <p className="text-muted-foreground">Entre no painel administrativo para adicionar eventos.</p>
+              </div>
+            )}
           </div>
         </section>
       </main>

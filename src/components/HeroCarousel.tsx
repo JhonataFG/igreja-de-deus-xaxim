@@ -1,42 +1,18 @@
+
 import { useState, useEffect, useCallback } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-interface Slide {
-  id: number;
-  image: string;
-  title: string;
-  subtitle: string;
-}
-
-const slides: Slide[] = [
-  {
-    id: 1,
-    image: "https://images.unsplash.com/photo-1438032005730-c779502df39b?w=1200&auto=format&fit=crop&q=80",
-    title: "Bem-vindo à Igreja de Deus Xaxim",
-    subtitle: "Um lugar para amar e servir",
-  },
-  {
-    id: 2,
-    image: "https://images.unsplash.com/photo-1544427920-c49ccfb85579?w=600&auto=format&fit=crop&q=80",
-    title: "Cultos aos Domingos",
-    subtitle: "Venha celebrar conosco às 10h e 18h",
-  },
-  {
-    id: 3,
-    image: "https://images.unsplash.com/photo-1442504028989-ab58b5f29a4a?w=600&auto=format&fit=crop&q=80",
-    title: "Uma Comunidade Acolhedora",
-    subtitle: "Juntos somos mais fortes na fé",
-  },
-];
+import { usePublicCarousel } from "@/hooks/carousel/use-public-carousel";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const HeroCarousel = () => {
+  const { slides, loading } = usePublicCarousel();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const totalSlides = slides.length;
 
   const nextSlide = useCallback(() => {
-    if (isTransitioning) return;
+    if (isTransitioning || totalSlides === 0) return;
 
     setIsTransitioning(true);
     setCurrentSlide((prev) => (prev === totalSlides - 1 ? 0 : prev + 1));
@@ -47,7 +23,7 @@ const HeroCarousel = () => {
   }, [totalSlides, isTransitioning]);
 
   const prevSlide = useCallback(() => {
-    if (isTransitioning) return;
+    if (isTransitioning || totalSlides === 0) return;
 
     setIsTransitioning(true);
     setCurrentSlide((prev) => (prev === 0 ? totalSlides - 1 : prev - 1));
@@ -58,12 +34,33 @@ const HeroCarousel = () => {
   }, [totalSlides, isTransitioning]);
 
   useEffect(() => {
+    if (totalSlides === 0) return;
+    
     const interval = setInterval(() => {
       nextSlide();
     }, 6000);
 
     return () => clearInterval(interval);
-  }, [nextSlide]);
+  }, [nextSlide, totalSlides]);
+
+  if (loading) {
+    return (
+      <div className="relative h-screen w-full overflow-hidden bg-gray-100">
+        <Skeleton className="h-full w-full" />
+      </div>
+    );
+  }
+
+  if (slides.length === 0) {
+    return (
+      <div className="relative h-screen w-full overflow-hidden flex items-center justify-center bg-primary/5">
+        <div className="text-center">
+          <h2 className="text-2xl font-serif font-medium mb-2">Carrossel não configurado</h2>
+          <p className="text-muted-foreground">Entre no painel administrativo para adicionar slides.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative h-screen w-full overflow-hidden">
