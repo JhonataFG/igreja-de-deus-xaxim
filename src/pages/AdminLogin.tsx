@@ -8,32 +8,48 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Lock } from "lucide-react";
-
-// This is a simple mock authentication - in a real application you'd use a proper auth system
-const ADMIN_USERNAME = "admin";
-const ADMIN_PASSWORD = "church123";
+import { supabase } from "@/integrations/supabase/client";
 
 const AdminLogin = () => {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
-    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-      // Set authenticated flag in localStorage (simple approach for demo)
-      localStorage.setItem("adminAuthenticated", "true");
-      toast({
-        title: "Login bem-sucedido",
-        description: "Bem-vindo ao painel administrativo.",
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
       });
-      navigate("/admin");
-    } else {
-      setError("Nome de usuário ou senha inválidos");
+
+      if (error) {
+        throw error;
+      }
+
+      if (data.session) {
+        localStorage.setItem("adminAuthenticated", "true");
+        toast({
+          title: "Login bem-sucedido",
+          description: "Bem-vindo ao painel administrativo.",
+        });
+        navigate("/admin");
+      }
+    } catch (error: any) {
+      setError(error.message || "Falha na autenticação. Verifique suas credenciais.");
+      toast({
+        title: "Erro de login",
+        description: error.message || "Falha na autenticação. Verifique suas credenciais.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -55,12 +71,12 @@ const AdminLogin = () => {
           <form onSubmit={handleLogin}>
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="username">Nome de usuário</Label>
+                <Label htmlFor="email">E-mail</Label>
                 <Input
-                  id="username"
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
                 />
               </div>
@@ -76,8 +92,8 @@ const AdminLogin = () => {
               </div>
             </div>
           
-            <Button type="submit" className="w-full mt-6">
-              Entrar
+            <Button type="submit" className="w-full mt-6" disabled={loading}>
+              {loading ? "Entrando..." : "Entrar"}
             </Button>
           </form>
         </CardContent>
