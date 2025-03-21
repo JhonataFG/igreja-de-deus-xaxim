@@ -11,8 +11,8 @@ import { EventFormValues, EventProps } from "@/types/event";
 
 interface EventDialogProps {
   isOpen: boolean;
-  onOpenChange: (open: boolean) => void;
-  onSubmit: (values: EventFormValues) => void;
+  onOpenChange: (open: boolean) => any;
+  onSubmit: (values: EventFormValues) => any;
   event?: EventProps;
   title: string;
 }
