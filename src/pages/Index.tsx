@@ -48,9 +48,9 @@ const Index = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto text-center mb-12">
               <span className="text-primary text-sm font-medium uppercase tracking-wider">Quem Somos</span>
-              <h2 className="section-title">Bem-vindo à Igreja da Paz</h2>
+              <h2 className="section-title">Bem-vindo à Igreja de Deus Xaxim</h2>
               <p className="text-muted-foreground mt-6">
-                A Igreja da Paz é uma comunidade cristã comprometida em propagar o amor de Cristo e servir ao próximo.
+                A Igreja de Deus Xaxim é uma comunidade cristã comprometida em propagar o amor de Cristo e servir ao próximo.
                 Acreditamos que todos são bem-vindos ao reino de Deus, independentemente de sua história ou circunstâncias.
                 Junte-se a nós em nossa jornada de fé, esperança e amor.
               </p>

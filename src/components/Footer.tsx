@@ -10,7 +10,7 @@ const Footer = () => {
       <div className="container mx-auto px-6 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
           <div className="space-y-4">
-            <h3 className="text-xl font-serif font-semibold">Igreja da Paz</h3>
+            <h3 className="text-xl font-serif font-semibold">Igreja de Deus Xaxim</h3>
             <p className="text-white/80 max-w-xs">
               Um lugar de paz, amor e comunhão. Venha fazer parte da nossa família e crescer na fé.
             </p>
@@ -72,7 +72,7 @@ const Footer = () => {
         </div>
         
         <div className="border-t border-white/20 mt-10 pt-6 text-center text-sm text-white/60">
-          <p>© {currentYear} Igreja da Paz. Todos os direitos reservados.</p>
+          <p>© {currentYear} Igreja de Deus Xaxim. Todos os direitos reservados.</p>
         </div>
       </div>
     </footer>

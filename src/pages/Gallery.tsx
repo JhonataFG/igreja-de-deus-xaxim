@@ -67,7 +67,7 @@ const galleryItems: GalleryItemProps[] = [
   {
     id: "9",
     title: "Nova Sede da Igreja",
-    description: "Inauguração da nova sede da Igreja da Paz, um marco importante na história da nossa comunidade.",
+    description: "Inauguração da nova sede da Igreja de Deus Xaxim, um marco importante na história da nossa comunidade.",
     category: "Instalações",
     image: "https://images.unsplash.com/photo-1526639194900-7ad2dff8afd4?w=600&auto=format&fit=crop&q=80"
   }

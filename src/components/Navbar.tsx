@@ -36,7 +36,7 @@ const Navbar = () => {
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center space-x-2" onClick={closeMobileMenu}>
             <span className={`font-serif text-2xl font-bold ${isScrolled ? "text-primary" : "text-white"}`}>
-              Igreja da Paz
+              Igreja de Deus Xaxim
             </span>
           </Link>
 

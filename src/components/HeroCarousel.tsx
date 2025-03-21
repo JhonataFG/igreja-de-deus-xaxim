@@ -14,7 +14,7 @@ const slides: Slide[] = [
   {
     id: 1,
     image: "https://images.unsplash.com/photo-1438032005730-c779502df39b?w=1200&auto=format&fit=crop&q=80",
-    title: "Bem-vindo à Igreja da Paz",
+    title: "Bem-vindo à Igreja de Deus Xaxim",
     subtitle: "Um lugar para encontrar fé, esperança e amor",
   },
   {
