@@ -1,18 +1,10 @@
-
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import {
-  Calendar,
-  Image,
-  Layers,
-  LayoutDashboard,
-  LogOut,
-  Menu,
-  X
-} from "lucide-react";
+import { Calendar, Image, Layers, LayoutDashboard, LogOut, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -25,8 +17,8 @@ const AdminLayout = ({ children, title }: AdminLayoutProps) => {
   const isMobile = useIsMobile();
   const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
 
-  const handleLogout = () => {
-    localStorage.removeItem("adminAuthenticated");
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
     toast({
       title: "Logout realizado",
       description: "Você saiu do painel administrativo.",
@@ -43,17 +35,8 @@ const AdminLayout = ({ children, title }: AdminLayoutProps) => {
       {/* Header */}
       <header className="bg-white border-b h-16 flex items-center justify-between px-4 md:px-6">
         <div className="flex items-center">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleSidebar}
-            className="mr-2 md:hidden"
-          >
-            {sidebarOpen ? (
-              <X className="h-5 w-5" />
-            ) : (
-              <Menu className="h-5 w-5" />
-            )}
+          <Button variant="ghost" size="icon" onClick={toggleSidebar} className="mr-2 md:hidden">
+            {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
           <h1 className="text-xl font-medium">Painel Administrativo</h1>
         </div>
@@ -65,7 +48,7 @@ const AdminLayout = ({ children, title }: AdminLayoutProps) => {
 
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
-        <aside 
+        <aside
           className={`bg-white border-r w-64 flex-shrink-0 flex flex-col transition-all duration-300 ${
             sidebarOpen ? "translate-x-0" : "-translate-x-full"
           } md:translate-x-0 fixed md:static inset-y-16 z-50 h-[calc(100vh-4rem)]`}
@@ -73,19 +56,15 @@ const AdminLayout = ({ children, title }: AdminLayoutProps) => {
           <nav className="flex-1 p-4">
             <ul className="space-y-1">
               <li>
-                <Button 
-                  variant="ghost" 
-                  className="w-full justify-start" 
-                  onClick={() => navigate("/admin")}
-                >
+                <Button variant="ghost" className="w-full justify-start" onClick={() => navigate("/admin")}>
                   <LayoutDashboard className="mr-2 h-4 w-4" />
                   Dashboard
                 </Button>
               </li>
               <li>
-                <Button 
-                  variant="ghost" 
-                  className="w-full justify-start" 
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start"
                   onClick={() => navigate("/admin/events")}
                 >
                   <Calendar className="mr-2 h-4 w-4" />
@@ -93,9 +72,9 @@ const AdminLayout = ({ children, title }: AdminLayoutProps) => {
                 </Button>
               </li>
               <li>
-                <Button 
-                  variant="ghost" 
-                  className="w-full justify-start" 
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start"
                   onClick={() => navigate("/admin/gallery")}
                 >
                   <Image className="mr-2 h-4 w-4" />
@@ -103,9 +82,9 @@ const AdminLayout = ({ children, title }: AdminLayoutProps) => {
                 </Button>
               </li>
               <li>
-                <Button 
-                  variant="ghost" 
-                  className="w-full justify-start" 
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start"
                   onClick={() => navigate("/admin/carousel")}
                 >
                   <Layers className="mr-2 h-4 w-4" />
@@ -115,11 +94,7 @@ const AdminLayout = ({ children, title }: AdminLayoutProps) => {
             </ul>
           </nav>
           <div className="p-4 border-t">
-            <Button 
-              variant="outline" 
-              className="w-full" 
-              onClick={() => navigate("/")}
-            >
+            <Button variant="outline" className="w-full" onClick={() => navigate("/")}>
               Ver Site
             </Button>
           </div>
