@@ -18,13 +18,13 @@ const slides: Slide[] = [
   },
   {
     id: 2,
-    image: "https://images.unsplash.com/photo-1601909251091-df3f6f5eca0c?w=1200&auto=format&fit=crop&q=80",
+    image: "https://images.unsplash.com/photo-1544427920-c49ccfb85579?w=600&auto=format&fit=crop&q=80",
     title: "Cultos aos Domingos",
     subtitle: "Venha celebrar conosco às 10h e 18h",
   },
   {
     id: 3,
-    image: "https://images.unsplash.com/photo-1577634081826-176659e87d74?w=1200&auto=format&fit=crop&q=80",
+    image: "https://images.unsplash.com/photo-1442504028989-ab58b5f29a4a?w=600&auto=format&fit=crop&q=80",
     title: "Uma Comunidade Acolhedora",
     subtitle: "Juntos somos mais fortes na fé",
   },
