@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Mail, MapPin, Phone, Send } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -55,8 +56,19 @@ export default function Contact() {
     setIsSubmitting(true);
     
     try {
-      // Simular envio de mensagem
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      // Submit form data to Supabase
+      const { error } = await supabase
+        .from('contact_submissions')
+        .insert([{
+          name: data.name,
+          email: data.email,
+          subject: data.subject,
+          message: data.message
+        }]);
+      
+      if (error) {
+        throw error;
+      }
       
       toast.success("Mensagem enviada com sucesso!", {
         description: "Entraremos em contato em breve.",
@@ -64,6 +76,7 @@ export default function Contact() {
       
       form.reset();
     } catch (error) {
+      console.error("Error submitting form:", error);
       toast.error("Erro ao enviar mensagem", {
         description: "Por favor, tente novamente mais tarde.",
       });

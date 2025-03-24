@@ -17,6 +17,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminEvents from "./pages/admin/AdminEvents";
 import AdminGallery from "./pages/admin/AdminGallery";
 import AdminCarousel from "./pages/admin/AdminCarousel";
+import AdminContact from "./pages/admin/AdminContact";
 
 const queryClient = new QueryClient();
 
@@ -66,6 +67,14 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <AdminCarousel />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/contact" 
+            element={
+              <ProtectedRoute>
+                <AdminContact />
               </ProtectedRoute>
             } 
           />
