@@ -3,6 +3,17 @@ import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/AdminLayout";
+import { Button } from "@/components/ui/button";
+import { Clipboard, Check } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 type ContactSubmission = {
   id: string;
@@ -11,9 +22,12 @@ type ContactSubmission = {
   subject: string;
   message: string;
   created_at: string;
+  status: "contatado" | "não contatado";
 };
 
 export default function AdminContact() {
+  const { toast } = useToast();
+  
   const fetchContactSubmissions = async () => {
     const { data, error } = await supabase
       .from("contact_submissions")
@@ -31,6 +45,7 @@ export default function AdminContact() {
     data: submissions,
     isLoading,
     error,
+    refetch
   } = useQuery({
     queryKey: ["contactSubmissions"],
     queryFn: fetchContactSubmissions,
@@ -45,6 +60,39 @@ export default function AdminContact() {
       hour: "2-digit",
       minute: "2-digit",
     }).format(date);
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast({
+      title: "Copiado!",
+      description: "O email foi copiado para a área de transferência.",
+    });
+  };
+
+  const updateStatus = async (id: string, currentStatus: string) => {
+    const newStatus = currentStatus === "contatado" ? "não contatado" : "contatado";
+    
+    const { error } = await supabase
+      .from("contact_submissions")
+      .update({ status: newStatus })
+      .eq("id", id);
+    
+    if (error) {
+      toast({
+        title: "Erro",
+        description: "Não foi possível atualizar o status do contato.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    toast({
+      title: "Status atualizado",
+      description: `Contato marcado como "${newStatus}".`,
+    });
+    
+    refetch();
   };
 
   return (
@@ -67,9 +115,76 @@ export default function AdminContact() {
             </p>
           </div>
         ) : (
+          <div className="bg-white rounded-lg shadow overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Data</TableHead>
+                  <TableHead>Nome</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Assunto</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Ações</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {submissions?.map((submission) => (
+                  <TableRow key={submission.id} className="group">
+                    <TableCell className="font-medium">
+                      {formatDate(submission.created_at)}
+                    </TableCell>
+                    <TableCell>{submission.name}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <span className="truncate max-w-32">{submission.email}</span>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={() => copyToClipboard(submission.email)}
+                          title="Copiar email"
+                        >
+                          <Clipboard className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                    <TableCell>{submission.subject}</TableCell>
+                    <TableCell>
+                      <span 
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          submission.status === "contatado" 
+                            ? "bg-green-100 text-green-800" 
+                            : "bg-amber-100 text-amber-800"
+                        }`}
+                      >
+                        {submission.status}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-8"
+                          onClick={() => updateStatus(submission.id, submission.status)}
+                        >
+                          <Check className="h-3.5 w-3.5 mr-1" />
+                          {submission.status === "contatado" ? "Marcar como não contatado" : "Marcar como contatado"}
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        )}
+        
+        <div className="mt-8">
+          <h2 className="text-xl font-bold mb-4">Detalhes das Mensagens</h2>
           <div className="grid gap-6">
             {submissions?.map((submission) => (
-              <div key={submission.id} className="bg-white p-6 rounded-lg shadow">
+              <div key={`detail-${submission.id}`} className="bg-white p-6 rounded-lg shadow">
                 <div className="flex justify-between mb-4">
                   <div>
                     <h3 className="font-semibold text-lg">{submission.subject}</h3>
@@ -77,15 +192,26 @@ export default function AdminContact() {
                       De: {submission.name} ({submission.email})
                     </div>
                   </div>
-                  <div className="text-sm text-muted-foreground">
-                    {formatDate(submission.created_at)}
+                  <div className="flex flex-col items-end gap-2">
+                    <div className="text-sm text-muted-foreground">
+                      {formatDate(submission.created_at)}
+                    </div>
+                    <span 
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        submission.status === "contatado" 
+                          ? "bg-green-100 text-green-800" 
+                          : "bg-amber-100 text-amber-800"
+                      }`}
+                    >
+                      {submission.status}
+                    </span>
                   </div>
                 </div>
                 <p className="text-gray-700 whitespace-pre-line">{submission.message}</p>
               </div>
             ))}
           </div>
-        )}
+        </div>
       </div>
     </AdminLayout>
   );
