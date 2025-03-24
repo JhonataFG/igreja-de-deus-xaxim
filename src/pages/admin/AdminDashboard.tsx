@@ -55,6 +55,21 @@ const AdminDashboard = () => {
             </Button>
           </CardContent>
         </Card>
+
+        <Card className="hover:shadow-md transition-all cursor-pointer" onClick={() => navigate("/admin/carousel")}>
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+            <CardTitle className="text-sm font-medium">Contatos</CardTitle>
+            <Layers className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <p className="text-xs text-muted-foreground mb-3">
+              Edite ou remova slides do carrossel da página inicial
+            </p>
+            <Button size="sm" variant="outline" className="w-full">
+              Gerenciar Contatos
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     </AdminLayout>
   );
