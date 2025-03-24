@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Events from "./pages/Events";
 import Gallery from "./pages/Gallery";
+import OurHistory from "./pages/OurHistory";
 import NotFound from "./pages/NotFound";
 import AdminLogin from "./pages/AdminLogin";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -28,6 +29,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/events" element={<Events />} />
           <Route path="/gallery" element={<Gallery />} />
+          <Route path="/our-history" element={<OurHistory />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           
           {/* Protected Admin Routes */}

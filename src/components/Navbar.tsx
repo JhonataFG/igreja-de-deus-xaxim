@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
@@ -83,6 +84,14 @@ const Navbar = () => {
             >
               Galeria
             </Link>
+            <Link
+              to="/our-history"
+              className={`navbar-link text-lg font-medium ${
+                isScrolled || !isActivePath("/") ? "text-foreground/80" : "text-white/90"
+              } ${isActivePath("/our-history") ? "after:scale-x-100 font-medium" : ""}`}
+            >
+              Nossa História
+            </Link>
             <Button
               variant="outline"
               className={`ml-4 ${"border-muted text-primary hover:bg-primary hover:text-white"}`}
@@ -132,6 +141,13 @@ const Navbar = () => {
               onClick={closeMobileMenu}
             >
               Galeria
+            </Link>
+            <Link
+              to="/our-history"
+              className="text-foreground/80 hover:text-primary py-2 border-b border-gray-100"
+              onClick={closeMobileMenu}
+            >
+              Nossa História
             </Link>
             <Button
               variant="outline"
