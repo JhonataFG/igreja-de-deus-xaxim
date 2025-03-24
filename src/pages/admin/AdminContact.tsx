@@ -48,7 +48,7 @@ export default function AdminContact() {
   };
 
   return (
-    <AdminLayout>
+    <AdminLayout title="Mensagens de Contato">
       <div className="container mx-auto py-8">
         <h1 className="text-2xl font-bold mb-6">Mensagens de Contato</h1>
 
