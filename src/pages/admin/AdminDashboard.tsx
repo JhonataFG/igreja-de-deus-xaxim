@@ -56,7 +56,7 @@ const AdminDashboard = () => {
           </CardContent>
         </Card>
 
-        <Card className="hover:shadow-md transition-all cursor-pointer" onClick={() => navigate("/admin/carousel")}>
+        <Card className="hover:shadow-md transition-all cursor-pointer" onClick={() => navigate("/admin/contact")}>
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium">Contatos</CardTitle>
             <Phone className="h-4 w-4 text-muted-foreground" />
