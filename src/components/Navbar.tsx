@@ -100,12 +100,14 @@ const Navbar = () => {
             >
               História no Brasil
             </Link>
-            <Button
-              variant="outline"
-              className={`ml-4 ${"border-muted text-primary hover:bg-primary hover:text-white"}`}
+            <Link
+              to="/contact"
+              className={`navbar-link text-lg font-medium ${
+                isScrolled || !isActivePath("/") ? "text-foreground/80" : "text-white/90"
+              } ${isActivePath("/contact") ? "after:scale-x-100 font-medium" : ""}`}
             >
               Contato
-            </Button>
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -164,12 +166,13 @@ const Navbar = () => {
             >
               História no Brasil
             </Link>
-            <Button
-              variant="outline"
-              className="border-primary text-primary hover:bg-primary hover:text-white"
+            <Link
+              to="/contact"
+              className="text-foreground/80 hover:text-primary py-2 border-b border-gray-100"
+              onClick={closeMobileMenu}
             >
               Contato
-            </Button>
+            </Link>
           </div>
         </div>
       </nav>
