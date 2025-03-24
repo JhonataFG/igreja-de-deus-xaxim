@@ -62,7 +62,7 @@ const Navbar = () => {
           <div className="hidden md:flex items-center space-x-8">
             <Link
               to="/"
-              className={`navbar-link text-lg font-medium ${
+              className={`navbar-link text-sm font-medium ${
                 isScrolled || !isActivePath("/") ? "text-foreground/80" : "text-white/90"
               } ${isActivePath("/") ? "after:scale-x-100 font-medium" : ""}`}
             >
@@ -70,7 +70,7 @@ const Navbar = () => {
             </Link>
             <Link
               to="/events"
-              className={`navbar-link text-lg font-medium ${
+              className={`navbar-link text-sm font-medium ${
                 isScrolled || !isActivePath("/") ? "text-foreground/80" : "text-white/90"
               } ${isActivePath("/events") ? "after:scale-x-100 font-medium" : ""}`}
             >
@@ -78,7 +78,7 @@ const Navbar = () => {
             </Link>
             <Link
               to="/gallery"
-              className={`navbar-link text-lg font-medium ${
+              className={`navbar-link text-sm font-medium ${
                 isScrolled || !isActivePath("/") ? "text-foreground/80" : "text-white/90"
               } ${isActivePath("/gallery") ? "after:scale-x-100 font-medium" : ""}`}
             >
@@ -86,7 +86,7 @@ const Navbar = () => {
             </Link>
             <Link
               to="/our-history"
-              className={`navbar-link text-lg font-medium ${
+              className={`navbar-link text-sm font-medium ${
                 isScrolled || !isActivePath("/") ? "text-foreground/80" : "text-white/90"
               } ${isActivePath("/our-history") ? "after:scale-x-100 font-medium" : ""}`}
             >
@@ -94,7 +94,7 @@ const Navbar = () => {
             </Link>
             <Link
               to="/church-history"
-              className={`navbar-link text-lg font-medium ${
+              className={`navbar-link text-sm font-medium ${
                 isScrolled || !isActivePath("/") ? "text-foreground/80" : "text-white/90"
               } ${isActivePath("/church-history") ? "after:scale-x-100 font-medium" : ""}`}
             >
@@ -102,7 +102,7 @@ const Navbar = () => {
             </Link>
             <Link
               to="/contact"
-              className={`navbar-link text-lg font-medium ${
+              className={`navbar-link text-sm font-medium ${
                 isScrolled || !isActivePath("/") ? "text-foreground/80" : "text-white/90"
               } ${isActivePath("/contact") ? "after:scale-x-100 font-medium" : ""}`}
             >
