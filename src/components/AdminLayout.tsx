@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Calendar, Image, Layers, LayoutDashboard, LogOut, Menu, X } from "lucide-react";
+import { Calendar, Image, Layers, LayoutDashboard, Phone,LogOut, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -89,6 +89,16 @@ const AdminLayout = ({ children, title }: AdminLayoutProps) => {
                 >
                   <Layers className="mr-2 h-4 w-4" />
                   Carrossel
+                </Button>
+              </li>
+              <li>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start"
+                  onClick={() => navigate("/admin/contact")}
+                >
+                  <Phone className="mr-2 h-4 w-4" />
+                  Contatos
                 </Button>
               </li>
             </ul>

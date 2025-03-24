@@ -1,7 +1,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import AdminLayout from "@/components/AdminLayout";
-import { Calendar, Image, Layers } from "lucide-react";
+import { Calendar, Image, Layers, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
@@ -59,7 +59,7 @@ const AdminDashboard = () => {
         <Card className="hover:shadow-md transition-all cursor-pointer" onClick={() => navigate("/admin/carousel")}>
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium">Contatos</CardTitle>
-            <Layers className="h-4 w-4 text-muted-foreground" />
+            <Phone className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <p className="text-xs text-muted-foreground mb-3">
