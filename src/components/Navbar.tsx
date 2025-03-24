@@ -92,6 +92,14 @@ const Navbar = () => {
             >
               Nossa História
             </Link>
+            <Link
+              to="/church-history"
+              className={`navbar-link text-lg font-medium ${
+                isScrolled || !isActivePath("/") ? "text-foreground/80" : "text-white/90"
+              } ${isActivePath("/church-history") ? "after:scale-x-100 font-medium" : ""}`}
+            >
+              História no Brasil
+            </Link>
             <Button
               variant="outline"
               className={`ml-4 ${"border-muted text-primary hover:bg-primary hover:text-white"}`}
@@ -148,6 +156,13 @@ const Navbar = () => {
               onClick={closeMobileMenu}
             >
               Nossa História
+            </Link>
+            <Link
+              to="/church-history"
+              className="text-foreground/80 hover:text-primary py-2 border-b border-gray-100"
+              onClick={closeMobileMenu}
+            >
+              História no Brasil
             </Link>
             <Button
               variant="outline"

@@ -45,6 +45,9 @@ const Footer = () => {
               <Link to="/our-history" className="text-white/80 hover:text-white transition-colors">
                 Nossa História
               </Link>
+              <Link to="/church-history" className="text-white/80 hover:text-white transition-colors">
+                História no Brasil
+              </Link>
               <a href="#" className="text-white/80 hover:text-white transition-colors">
                 Contato
               </a>
