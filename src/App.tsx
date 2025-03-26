@@ -18,6 +18,8 @@ import AdminEvents from "./pages/admin/AdminEvents";
 import AdminGallery from "./pages/admin/AdminGallery";
 import AdminCarousel from "./pages/admin/AdminCarousel";
 import AdminContact from "./pages/admin/AdminContact";
+import AdminPresence from "./pages/admin/AdminPresence";
+import AdminAttendance from "./pages/admin/AdminAttendance";
 
 const queryClient = new QueryClient();
 
@@ -75,6 +77,22 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <AdminContact />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/presence" 
+            element={
+              <ProtectedRoute>
+                <AdminPresence />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/presence/attendance/:eventId" 
+            element={
+              <ProtectedRoute>
+                <AdminAttendance />
               </ProtectedRoute>
             } 
           />
