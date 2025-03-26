@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -212,7 +211,7 @@ export default function AdminContact() {
                       De: {submission.name} ({submission.email})
                       {submission.whatsapp && (
                         <span className="ml-2 flex items-center gap-1">
-                          <Phone className="h-3.5 w-3.5" inline="true" />
+                          <Phone className="h-3.5 w-3.5" />
                           {submission.whatsapp}
                           <Button
                             variant="ghost"
