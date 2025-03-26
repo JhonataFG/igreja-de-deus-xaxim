@@ -3,6 +3,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Book, Building, CalendarDays, Users, Church, BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 const ChurchHistory = () => {
   return (
@@ -42,61 +43,113 @@ const ChurchHistory = () => {
                 </p>
                 
                 <div className="my-8 bg-quaternary/10 p-6 rounded-lg">
-                  <div className="flex items-center mb-4">
-                    <CalendarDays className="h-6 w-6 text-primary mr-3" />
-                    <h3 className="text-xl font-serif font-medium">Primeiros Anos (1950-1960)</h3>
+                  <div className="flex flex-col sm:flex-row gap-6">
+                    <div className="sm:w-1/3">
+                      <AspectRatio ratio={4/3} className="bg-muted rounded-md overflow-hidden">
+                        <img 
+                          src="https://images.unsplash.com/photo-1566193135793-4998d98a0d04?q=80&w=600&auto=format&fit=crop" 
+                          alt="Primeiros Anos (1950-1960)" 
+                          className="object-cover w-full h-full"
+                        />
+                      </AspectRatio>
+                    </div>
+                    <div className="sm:w-2/3">
+                      <div className="flex items-center mb-4">
+                        <CalendarDays className="h-6 w-6 text-primary mr-3 flex-shrink-0" />
+                        <h3 className="text-xl font-serif font-medium">Primeiros Anos (1950-1960)</h3>
+                      </div>
+                      <p>
+                        Os primeiros missionários da Igreja de Deus chegaram ao Brasil em meados da década de 1950, 
+                        estabelecendo pequenas congregações inicialmente nos estados de São Paulo e Minas Gerais. 
+                        Apesar das dificuldades com o idioma e adaptação cultural, o trabalho cresceu gradativamente, 
+                        atraindo brasileiros interessados em uma nova expressão de fé cristã.
+                      </p>
+                    </div>
                   </div>
-                  <p>
-                    Os primeiros missionários da Igreja de Deus chegaram ao Brasil em meados da década de 1950, 
-                    estabelecendo pequenas congregações inicialmente nos estados de São Paulo e Minas Gerais. 
-                    Apesar das dificuldades com o idioma e adaptação cultural, o trabalho cresceu gradativamente, 
-                    atraindo brasileiros interessados em uma nova expressão de fé cristã.
-                  </p>
                 </div>
 
                 <div className="my-8 bg-quaternary/10 p-6 rounded-lg">
-                  <div className="flex items-center mb-4">
-                    <Building className="h-6 w-6 text-primary mr-3" />
-                    <h3 className="text-xl font-serif font-medium">Expansão (1960-1980)</h3>
+                  <div className="flex flex-col sm:flex-row gap-6">
+                    <div className="sm:w-1/3">
+                      <AspectRatio ratio={4/3} className="bg-muted rounded-md overflow-hidden">
+                        <img 
+                          src="https://images.unsplash.com/photo-1613553335007-8c139bb5f140?q=80&w=600&auto=format&fit=crop" 
+                          alt="Expansão (1960-1980)" 
+                          className="object-cover w-full h-full"
+                        />
+                      </AspectRatio>
+                    </div>
+                    <div className="sm:w-2/3">
+                      <div className="flex items-center mb-4">
+                        <Building className="h-6 w-6 text-primary mr-3 flex-shrink-0" />
+                        <h3 className="text-xl font-serif font-medium">Expansão (1960-1980)</h3>
+                      </div>
+                      <p>
+                        Nas décadas seguintes, a Igreja de Deus experimentou um crescimento significativo, 
+                        expandindo-se para outras regiões do país. Pastores brasileiros começaram a ser formados, 
+                        o que facilitou a contextualização da mensagem e a conexão com a cultura local. 
+                        O primeiro seminário da denominação foi estabelecido em 1968, formando líderes nacionais 
+                        que ajudariam a consolidar o trabalho em todo o território.
+                      </p>
+                    </div>
                   </div>
-                  <p>
-                    Nas décadas seguintes, a Igreja de Deus experimentou um crescimento significativo, 
-                    expandindo-se para outras regiões do país. Pastores brasileiros começaram a ser formados, 
-                    o que facilitou a contextualização da mensagem e a conexão com a cultura local. 
-                    O primeiro seminário da denominação foi estabelecido em 1968, formando líderes nacionais 
-                    que ajudariam a consolidar o trabalho em todo o território.
-                  </p>
                 </div>
 
                 <div className="my-8 bg-quaternary/10 p-6 rounded-lg">
-                  <div className="flex items-center mb-4">
-                    <Users className="h-6 w-6 text-primary mr-3" />
-                    <h3 className="text-xl font-serif font-medium">Consolidação (1980-2000)</h3>
+                  <div className="flex flex-col sm:flex-row gap-6">
+                    <div className="sm:w-1/3">
+                      <AspectRatio ratio={4/3} className="bg-muted rounded-md overflow-hidden">
+                        <img 
+                          src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=600&auto=format&fit=crop" 
+                          alt="Consolidação (1980-2000)" 
+                          className="object-cover w-full h-full"
+                        />
+                      </AspectRatio>
+                    </div>
+                    <div className="sm:w-2/3">
+                      <div className="flex items-center mb-4">
+                        <Users className="h-6 w-6 text-primary mr-3 flex-shrink-0" />
+                        <h3 className="text-xl font-serif font-medium">Consolidação (1980-2000)</h3>
+                      </div>
+                      <p>
+                        Durante as décadas de 1980 e 1990, a Igreja de Deus no Brasil passou por um período de 
+                        consolidação, com estruturas administrativas sendo estabelecidas e a formação de uma 
+                        identidade nacional mais forte. O número de congregações continuou crescendo, e programas 
+                        sociais começaram a ser implementados, atendendo comunidades carentes em diversas regiões do país.
+                      </p>
+                    </div>
                   </div>
-                  <p>
-                    Durante as décadas de 1980 e 1990, a Igreja de Deus no Brasil passou por um período de 
-                    consolidação, com estruturas administrativas sendo estabelecidas e a formação de uma 
-                    identidade nacional mais forte. O número de congregações continuou crescendo, e programas 
-                    sociais começaram a ser implementados, atendendo comunidades carentes em diversas regiões do país.
-                  </p>
                 </div>
 
                 <div className="my-8 bg-quaternary/10 p-6 rounded-lg">
-                  <div className="flex items-center mb-4">
-                    <Church className="h-6 w-6 text-primary mr-3" />
-                    <h3 className="text-xl font-serif font-medium">Era Moderna (2000-Presente)</h3>
+                  <div className="flex flex-col sm:flex-row gap-6">
+                    <div className="sm:w-1/3">
+                      <AspectRatio ratio={4/3} className="bg-muted rounded-md overflow-hidden">
+                        <img 
+                          src="https://images.unsplash.com/photo-1490730141103-6cac27aaab94?q=80&w=600&auto=format&fit=crop" 
+                          alt="Era Moderna (2000-Presente)" 
+                          className="object-cover w-full h-full"
+                        />
+                      </AspectRatio>
+                    </div>
+                    <div className="sm:w-2/3">
+                      <div className="flex items-center mb-4">
+                        <Church className="h-6 w-6 text-primary mr-3 flex-shrink-0" />
+                        <h3 className="text-xl font-serif font-medium">Era Moderna (2000-Presente)</h3>
+                      </div>
+                      <p>
+                        No novo milênio, a Igreja de Deus se adaptou às mudanças culturais e tecnológicas, 
+                        alcançando novas gerações através de meios digitais e abordagens contemporâneas. 
+                        O compromisso com a educação teológica se fortaleceu, e parcerias com outras denominações 
+                        foram estabelecidas para projetos sociais e evangelísticos.
+                      </p>
+                      <p>
+                        Hoje, a Igreja de Deus está presente em todos os estados brasileiros, com milhares de 
+                        congregações e uma variada gama de ministérios que atendem diferentes necessidades sociais 
+                        e espirituais.
+                      </p>
+                    </div>
                   </div>
-                  <p>
-                    No novo milênio, a Igreja de Deus se adaptou às mudanças culturais e tecnológicas, 
-                    alcançando novas gerações através de meios digitais e abordagens contemporâneas. 
-                    O compromisso com a educação teológica se fortaleceu, e parcerias com outras denominações 
-                    foram estabelecidas para projetos sociais e evangelísticos.
-                  </p>
-                  <p>
-                    Hoje, a Igreja de Deus está presente em todos os estados brasileiros, com milhares de 
-                    congregações e uma variada gama de ministérios que atendem diferentes necessidades sociais 
-                    e espirituais.
-                  </p>
                 </div>
               </div>
             </div>

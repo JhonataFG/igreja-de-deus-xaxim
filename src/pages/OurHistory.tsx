@@ -2,6 +2,8 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Book, Building, CalendarDays, Users } from "lucide-react";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { Link } from "react-router-dom";
 
 const OurHistory = () => {
   return (
@@ -31,9 +33,18 @@ const OurHistory = () => {
                 {/* Timeline Item 1 */}
                 <div className="flex flex-col md:flex-row">
                   <div className="md:w-1/3 mb-4 md:mb-0">
-                    <div className="flex items-center md:justify-end md:pr-8">
+                    <div className="flex items-center md:justify-end md:pr-8 mb-4">
                       <CalendarDays className="w-5 h-5 text-primary mr-2" />
                       <span className="text-lg font-medium text-primary">1980</span>
+                    </div>
+                    <div className="md:pr-8 mb-4">
+                      <AspectRatio ratio={4/3} className="bg-muted rounded-md overflow-hidden">
+                        <img 
+                          src="https://images.unsplash.com/photo-1535850836387-0f9dfce30846?q=80&w=600&auto=format&fit=crop" 
+                          alt="Primeiros encontros da Igreja de Deus em Xaxim" 
+                          className="object-cover w-full h-full"
+                        />
+                      </AspectRatio>
                     </div>
                   </div>
                   <div className="md:w-2/3 md:pl-8 md:border-l border-primary/30">
@@ -49,9 +60,18 @@ const OurHistory = () => {
                 {/* Timeline Item 2 */}
                 <div className="flex flex-col md:flex-row">
                   <div className="md:w-1/3 mb-4 md:mb-0">
-                    <div className="flex items-center md:justify-end md:pr-8">
+                    <div className="flex items-center md:justify-end md:pr-8 mb-4">
                       <Building className="w-5 h-5 text-primary mr-2" />
                       <span className="text-lg font-medium text-primary">1985</span>
+                    </div>
+                    <div className="md:pr-8 mb-4">
+                      <AspectRatio ratio={4/3} className="bg-muted rounded-md overflow-hidden">
+                        <img 
+                          src="https://images.unsplash.com/photo-1543858671-a233f04fa36d?q=80&w=600&auto=format&fit=crop" 
+                          alt="Primeiro templo da Igreja de Deus em Xaxim" 
+                          className="object-cover w-full h-full"
+                        />
+                      </AspectRatio>
                     </div>
                   </div>
                   <div className="md:w-2/3 md:pl-8 md:border-l border-primary/30">
@@ -67,9 +87,18 @@ const OurHistory = () => {
                 {/* Timeline Item 3 */}
                 <div className="flex flex-col md:flex-row">
                   <div className="md:w-1/3 mb-4 md:mb-0">
-                    <div className="flex items-center md:justify-end md:pr-8">
+                    <div className="flex items-center md:justify-end md:pr-8 mb-4">
                       <Users className="w-5 h-5 text-primary mr-2" />
                       <span className="text-lg font-medium text-primary">1995</span>
+                    </div>
+                    <div className="md:pr-8 mb-4">
+                      <AspectRatio ratio={4/3} className="bg-muted rounded-md overflow-hidden">
+                        <img 
+                          src="https://images.unsplash.com/photo-1523803326055-15db29518866?q=80&w=600&auto=format&fit=crop" 
+                          alt="Crescimento da congregação" 
+                          className="object-cover w-full h-full"
+                        />
+                      </AspectRatio>
                     </div>
                   </div>
                   <div className="md:w-2/3 md:pl-8 md:border-l border-primary/30">
@@ -85,9 +114,18 @@ const OurHistory = () => {
                 {/* Timeline Item 4 */}
                 <div className="flex flex-col md:flex-row">
                   <div className="md:w-1/3 mb-4 md:mb-0">
-                    <div className="flex items-center md:justify-end md:pr-8">
+                    <div className="flex items-center md:justify-end md:pr-8 mb-4">
                       <Book className="w-5 h-5 text-primary mr-2" />
                       <span className="text-lg font-medium text-primary">2010</span>
+                    </div>
+                    <div className="md:pr-8 mb-4">
+                      <AspectRatio ratio={4/3} className="bg-muted rounded-md overflow-hidden">
+                        <img 
+                          src="https://images.unsplash.com/photo-1504052434569-70ad5836ab65?q=80&w=600&auto=format&fit=crop" 
+                          alt="Nova fase da igreja com ministérios sociais" 
+                          className="object-cover w-full h-full"
+                        />
+                      </AspectRatio>
                     </div>
                   </div>
                   <div className="md:w-2/3 md:pl-8 md:border-l border-primary/30">
@@ -103,9 +141,18 @@ const OurHistory = () => {
                 {/* Timeline Item 5 */}
                 <div className="flex flex-col md:flex-row">
                   <div className="md:w-1/3 mb-4 md:mb-0">
-                    <div className="flex items-center md:justify-end md:pr-8">
+                    <div className="flex items-center md:justify-end md:pr-8 mb-4">
                       <Building className="w-5 h-5 text-primary mr-2" />
                       <span className="text-lg font-medium text-primary">Hoje</span>
+                    </div>
+                    <div className="md:pr-8 mb-4">
+                      <AspectRatio ratio={4/3} className="bg-muted rounded-md overflow-hidden">
+                        <img 
+                          src="/id_xaxim_1.JPG" 
+                          alt="Igreja atual" 
+                          className="object-cover w-full h-full"
+                        />
+                      </AspectRatio>
                     </div>
                   </div>
                   <div className="md:w-2/3 md:pl-8 md:border-l border-primary/30">
