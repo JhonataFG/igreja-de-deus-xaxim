@@ -5,14 +5,7 @@ import AdminLayout from "@/components/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Clipboard, Check, Phone } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 type ContactSubmission = {
   id: string;
@@ -27,7 +20,7 @@ type ContactSubmission = {
 
 export default function AdminContact() {
   const { toast } = useToast();
-  
+
   const fetchContactSubmissions = async () => {
     const { data, error } = await supabase
       .from("contact_submissions")
@@ -45,7 +38,7 @@ export default function AdminContact() {
     data: submissions,
     isLoading,
     error,
-    refetch
+    refetch,
   } = useQuery({
     queryKey: ["contactSubmissions"],
     queryFn: fetchContactSubmissions,
@@ -62,22 +55,21 @@ export default function AdminContact() {
     }).format(date);
   };
 
-  const copyToClipboard = (text: string, type: 'email' | 'whatsapp' = 'email') => {
+  const copyToClipboard = (text: string, type: "email" | "whatsapp" = "email") => {
     navigator.clipboard.writeText(text);
     toast({
       title: "Copiado!",
-      description: `O ${type === 'email' ? 'email' : 'número de WhatsApp'} foi copiado para a área de transferência.`,
+      description: `O ${
+        type === "email" ? "email" : "número de WhatsApp"
+      } foi copiado para a área de transferência.`,
     });
   };
 
   const updateStatus = async (id: string, currentStatus: string) => {
     const newStatus = currentStatus === "contatado" ? "não contatado" : "contatado";
-    
-    const { error } = await supabase
-      .from("contact_submissions")
-      .update({ status: newStatus })
-      .eq("id", id);
-    
+    console.log(id, currentStatus, newStatus);
+    const { error } = await supabase.from("contact_submissions").update({ status: newStatus }).eq("id", id);
+
     if (error) {
       toast({
         title: "Erro",
@@ -86,12 +78,12 @@ export default function AdminContact() {
       });
       return;
     }
-    
+
     toast({
       title: "Status atualizado",
       description: `Contato marcado como "${newStatus}".`,
     });
-    
+
     refetch();
   };
 
@@ -110,9 +102,7 @@ export default function AdminContact() {
           </div>
         ) : submissions?.length === 0 ? (
           <div className="bg-muted p-8 text-center rounded-md">
-            <p className="text-muted-foreground">
-              Nenhuma mensagem de contato recebida ainda.
-            </p>
+            <p className="text-muted-foreground">Nenhuma mensagem de contato recebida ainda.</p>
           </div>
         ) : (
           <div className="bg-white rounded-lg shadow overflow-hidden">
@@ -131,9 +121,7 @@ export default function AdminContact() {
               <TableBody>
                 {submissions?.map((submission) => (
                   <TableRow key={submission.id} className="group">
-                    <TableCell className="font-medium">
-                      {formatDate(submission.created_at)}
-                    </TableCell>
+                    <TableCell className="font-medium">{formatDate(submission.created_at)}</TableCell>
                     <TableCell>{submission.name}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
@@ -142,7 +130,7 @@ export default function AdminContact() {
                           variant="ghost"
                           size="icon"
                           className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                          onClick={() => copyToClipboard(submission.email, 'email')}
+                          onClick={() => copyToClipboard(submission.email, "email")}
                           title="Copiar email"
                         >
                           <Clipboard className="h-3.5 w-3.5" />
@@ -157,7 +145,7 @@ export default function AdminContact() {
                             variant="ghost"
                             size="icon"
                             className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                            onClick={() => copyToClipboard(submission.whatsapp || '', 'whatsapp')}
+                            onClick={() => copyToClipboard(submission.whatsapp || "", "whatsapp")}
                             title="Copiar WhatsApp"
                           >
                             <Phone className="h-3.5 w-3.5" />
@@ -169,10 +157,10 @@ export default function AdminContact() {
                     </TableCell>
                     <TableCell>{submission.subject}</TableCell>
                     <TableCell>
-                      <span 
+                      <span
                         className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          submission.status === "contatado" 
-                            ? "bg-green-100 text-green-800" 
+                          submission.status === "contatado"
+                            ? "bg-green-100 text-green-800"
                             : "bg-amber-100 text-amber-800"
                         }`}
                       >
@@ -188,7 +176,9 @@ export default function AdminContact() {
                           onClick={() => updateStatus(submission.id, submission.status)}
                         >
                           <Check className="h-3.5 w-3.5 mr-1" />
-                          {submission.status === "contatado" ? "Marcar como não contatado" : "Marcar como contatado"}
+                          {submission.status === "contatado"
+                            ? "Marcar como não contatado"
+                            : "Marcar como contatado"}
                         </Button>
                       </div>
                     </TableCell>
@@ -198,7 +188,7 @@ export default function AdminContact() {
             </Table>
           </div>
         )}
-        
+
         <div className="mt-8">
           <h2 className="text-xl font-bold mb-4">Detalhes das Mensagens</h2>
           <div className="grid gap-6">
@@ -217,7 +207,7 @@ export default function AdminContact() {
                             variant="ghost"
                             size="icon"
                             className="h-6 w-6 ml-1"
-                            onClick={() => copyToClipboard(submission.whatsapp || '', 'whatsapp')}
+                            onClick={() => copyToClipboard(submission.whatsapp || "", "whatsapp")}
                             title="Copiar WhatsApp"
                           >
                             <Clipboard className="h-3.5 w-3.5" />
@@ -227,13 +217,11 @@ export default function AdminContact() {
                     </div>
                   </div>
                   <div className="flex flex-col items-end gap-2">
-                    <div className="text-sm text-muted-foreground">
-                      {formatDate(submission.created_at)}
-                    </div>
-                    <span 
+                    <div className="text-sm text-muted-foreground">{formatDate(submission.created_at)}</div>
+                    <span
                       className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        submission.status === "contatado" 
-                          ? "bg-green-100 text-green-800" 
+                        submission.status === "contatado"
+                          ? "bg-green-100 text-green-800"
                           : "bg-amber-100 text-amber-800"
                       }`}
                     >

@@ -1,4 +1,3 @@
-
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Book, Building, CalendarDays, Users } from "lucide-react";
@@ -18,7 +17,9 @@ const OurHistory = () => {
           <div className="absolute inset-0 bg-quaternary/70 backdrop-blur-sm"></div>
           <div className="container mx-auto px-6 relative z-10">
             <div className="max-w-3xl mx-auto text-center animate-fade-in">
-              <h1 className="text-4xl md:text-6xl font-serif font-bold text-white mb-6 leading-tight">Nossa História</h1>
+              <h1 className="text-4xl md:text-6xl font-serif font-bold text-white mb-6 leading-tight">
+                Nossa História
+              </h1>
               <p className="text-white/90 text-lg md:text-xl max-w-2xl mx-auto">
                 Conheça a jornada de fé e dedicação que formou a Igreja de Deus Xaxim ao longo dos anos.
               </p>
@@ -31,33 +32,39 @@ const OurHistory = () => {
           <div className="container mx-auto px-6">
             <div className="max-w-5xl mx-auto">
               <div className="mb-16 text-center">
-                <span className="inline-block py-1 px-3 rounded-full bg-primary/10 text-primary text-sm font-medium uppercase tracking-wider mb-4">Nossa Jornada</span>
+                <span className="inline-block py-1 px-3 rounded-full bg-primary/10 text-primary text-sm font-medium uppercase tracking-wider mb-4">
+                  Nossa Jornada
+                </span>
                 <h2 className="text-3xl md:text-4xl font-serif font-semibold">Os Marcos da Nossa História</h2>
                 <div className="h-1 w-24 bg-primary/30 rounded mx-auto mt-6"></div>
               </div>
-              
+
               <div className="relative">
                 {/* Timeline vertical line */}
                 <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-primary/20 rounded hidden md:block"></div>
-                
+
                 <div className="space-y-24">
                   {/* Timeline Item 1 */}
                   <div className="relative">
                     <div className="hidden md:block absolute left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-primary"></div>
                     <div className="md:flex items-center">
                       <div className="md:w-1/2 md:pr-12 mb-6 md:mb-0 text-right hidden md:block">
-                        <span className="inline-block bg-primary text-white text-xl font-semibold px-4 py-1 rounded-md">1980</span>
+                        <span className="inline-block bg-primary text-white text-xl font-semibold px-4 py-1 rounded-md">
+                          1980
+                        </span>
                       </div>
                       <div className="md:w-1/2 md:pl-12">
                         <Card className="overflow-hidden border-none shadow-xl hover:shadow-2xl transition-all bg-white">
                           <div className="block md:hidden text-center mt-6">
-                            <span className="inline-block bg-primary text-white text-xl font-semibold px-4 py-1 rounded-md">1980</span>
+                            <span className="inline-block bg-primary text-white text-xl font-semibold px-4 py-1 rounded-md">
+                              1980
+                            </span>
                           </div>
                           <CardContent className="p-0">
-                            <AspectRatio ratio={16/9} className="bg-muted">
-                              <img 
-                                src="https://images.unsplash.com/photo-1535850836387-0f9dfce30846?q=80&w=800&auto=format&fit=crop" 
-                                alt="Primeiros encontros da Igreja de Deus em Xaxim" 
+                            <AspectRatio ratio={16 / 9} className="bg-muted">
+                              <img
+                                src="https://images.unsplash.com/photo-1535850836387-0f9dfce30846?q=80&w=800&auto=format&fit=crop"
+                                alt="Primeiros encontros da Igreja de Deus em Xaxim"
                                 className="object-cover w-full h-full"
                               />
                             </AspectRatio>
@@ -67,9 +74,10 @@ const OurHistory = () => {
                                 <h3 className="text-2xl font-serif font-semibold">Primeiros Encontros</h3>
                               </div>
                               <p className="text-muted-foreground">
-                                Os primeiros encontros da Igreja de Deus em Xaxim começaram em uma pequena sala com apenas 
-                                cinco famílias que se reuniam para orar e estudar a Palavra de Deus. 
-                                O que começou como um pequeno grupo de oração logo se transformou em um movimento de fé.
+                                Os primeiros encontros da Igreja de Deus em Xaxim começaram em uma pequena
+                                sala com apenas cinco famílias que se reuniam para orar e estudar a Palavra de
+                                Deus. O que começou como um pequeno grupo de oração logo se transformou em um
+                                movimento de fé.
                               </p>
                             </div>
                           </CardContent>
@@ -85,32 +93,38 @@ const OurHistory = () => {
                       <div className="md:w-1/2 md:pr-12 text-right">
                         <Card className="overflow-hidden border-none shadow-xl hover:shadow-2xl transition-all bg-white">
                           <div className="block md:hidden text-center mt-6">
-                            <span className="inline-block bg-primary text-white text-xl font-semibold px-4 py-1 rounded-md">1985</span>
+                            <span className="inline-block bg-primary text-white text-xl font-semibold px-4 py-1 rounded-md">
+                              1985
+                            </span>
                           </div>
                           <CardContent className="p-0">
-                            <AspectRatio ratio={16/9} className="bg-muted">
-                              <img 
-                                src="https://images.unsplash.com/photo-1543858671-a233f04fa36d?q=80&w=800&auto=format&fit=crop" 
-                                alt="Primeiro templo da Igreja de Deus em Xaxim" 
+                            <AspectRatio ratio={16 / 9} className="bg-muted">
+                              <img
+                                src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=800&auto=format&fit=crop"
+                                alt="Primeiro templo da Igreja de Deus em Xaxim"
                                 className="object-cover w-full h-full"
                               />
                             </AspectRatio>
                             <div className="p-6">
                               <div className="flex items-center mb-3 md:justify-end">
-                                <h3 className="text-2xl font-serif font-semibold md:order-1">Primeiro Templo</h3>
+                                <h3 className="text-2xl font-serif font-semibold md:order-1">
+                                  Primeiro Templo
+                                </h3>
                                 <Building className="w-5 h-5 text-primary ml-0 mr-2 md:ml-2 md:mr-0 md:order-2" />
                               </div>
                               <p className="text-muted-foreground md:text-right">
-                                Após anos de dedicação e arrecadação de fundos, foi possível adquirir um terreno e 
-                                construir o primeiro templo da Igreja de Deus Xaxim. A inauguração foi marcada por 
-                                uma celebração que reuniu mais de 200 pessoas da comunidade.
+                                Após anos de dedicação e arrecadação de fundos, foi possível adquirir um
+                                terreno e construir o primeiro templo da Igreja de Deus Xaxim. A inauguração
+                                foi marcada por uma celebração que reuniu mais de 200 pessoas da comunidade.
                               </p>
                             </div>
                           </CardContent>
                         </Card>
                       </div>
                       <div className="md:w-1/2 md:pl-12 mb-6 md:mb-0 hidden md:block">
-                        <span className="inline-block bg-primary text-white text-xl font-semibold px-4 py-1 rounded-md">1985</span>
+                        <span className="inline-block bg-primary text-white text-xl font-semibold px-4 py-1 rounded-md">
+                          1985
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -120,30 +134,36 @@ const OurHistory = () => {
                     <div className="hidden md:block absolute left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-primary"></div>
                     <div className="md:flex items-center">
                       <div className="md:w-1/2 md:pr-12 mb-6 md:mb-0 text-right hidden md:block">
-                        <span className="inline-block bg-primary text-white text-xl font-semibold px-4 py-1 rounded-md">1995</span>
+                        <span className="inline-block bg-primary text-white text-xl font-semibold px-4 py-1 rounded-md">
+                          1995
+                        </span>
                       </div>
                       <div className="md:w-1/2 md:pl-12">
                         <Card className="overflow-hidden border-none shadow-xl hover:shadow-2xl transition-all bg-white">
                           <div className="block md:hidden text-center mt-6">
-                            <span className="inline-block bg-primary text-white text-xl font-semibold px-4 py-1 rounded-md">1995</span>
+                            <span className="inline-block bg-primary text-white text-xl font-semibold px-4 py-1 rounded-md">
+                              1995
+                            </span>
                           </div>
                           <CardContent className="p-0">
-                            <AspectRatio ratio={16/9} className="bg-muted">
-                              <img 
-                                src="https://images.unsplash.com/photo-1523803326055-15db29518866?q=80&w=800&auto=format&fit=crop" 
-                                alt="Crescimento da congregação" 
+                            <AspectRatio ratio={16 / 9} className="bg-muted">
+                              <img
+                                src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=800&auto=format&fit=crop"
+                                alt="Crescimento da congregação"
                                 className="object-cover w-full h-full"
                               />
                             </AspectRatio>
                             <div className="p-6">
                               <div className="flex items-center mb-3">
                                 <Users className="w-5 h-5 text-primary mr-2" />
-                                <h3 className="text-2xl font-serif font-semibold">Crescimento da Congregação</h3>
+                                <h3 className="text-2xl font-serif font-semibold">
+                                  Crescimento da Congregação
+                                </h3>
                               </div>
                               <p className="text-muted-foreground">
-                                Com o crescimento contínuo da congregação, foi necessário expandir o templo. 
-                                Foram adicionadas novas salas para a escola dominical e um auditório maior para 
-                                acomodar os cultos que agora recebiam mais de 500 fiéis regularmente.
+                                Com o crescimento contínuo da congregação, foi necessário expandir o templo.
+                                Foram adicionadas novas salas para a escola dominical e um auditório maior
+                                para acomodar os cultos que agora recebiam mais de 500 fiéis regularmente.
                               </p>
                             </div>
                           </CardContent>
@@ -159,13 +179,15 @@ const OurHistory = () => {
                       <div className="md:w-1/2 md:pr-12 text-right">
                         <Card className="overflow-hidden border-none shadow-xl hover:shadow-2xl transition-all bg-white">
                           <div className="block md:hidden text-center mt-6">
-                            <span className="inline-block bg-primary text-white text-xl font-semibold px-4 py-1 rounded-md">2010</span>
+                            <span className="inline-block bg-primary text-white text-xl font-semibold px-4 py-1 rounded-md">
+                              2010
+                            </span>
                           </div>
                           <CardContent className="p-0">
-                            <AspectRatio ratio={16/9} className="bg-muted">
-                              <img 
-                                src="https://images.unsplash.com/photo-1504052434569-70ad5836ab65?q=80&w=800&auto=format&fit=crop" 
-                                alt="Nova fase da igreja com ministérios sociais" 
+                            <AspectRatio ratio={16 / 9} className="bg-muted">
+                              <img
+                                src="https://images.unsplash.com/photo-1504052434569-70ad5836ab65?q=80&w=800&auto=format&fit=crop"
+                                alt="Nova fase da igreja com ministérios sociais"
                                 className="object-cover w-full h-full"
                               />
                             </AspectRatio>
@@ -175,16 +197,19 @@ const OurHistory = () => {
                                 <Book className="w-5 h-5 text-primary ml-0 mr-2 md:ml-2 md:mr-0 md:order-2" />
                               </div>
                               <p className="text-muted-foreground md:text-right">
-                                A igreja começou uma nova fase com a implementação de ministérios sociais, 
-                                atendendo às necessidades da comunidade local. Foram criados programas de auxílio 
-                                a famílias carentes, aulas de música para jovens e grupos de apoio diversos.
+                                A igreja começou uma nova fase com a implementação de ministérios sociais,
+                                atendendo às necessidades da comunidade local. Foram criados programas de
+                                auxílio a famílias carentes, aulas de música para jovens e grupos de apoio
+                                diversos.
                               </p>
                             </div>
                           </CardContent>
                         </Card>
                       </div>
                       <div className="md:w-1/2 md:pl-12 mb-6 md:mb-0 hidden md:block">
-                        <span className="inline-block bg-primary text-white text-xl font-semibold px-4 py-1 rounded-md">2010</span>
+                        <span className="inline-block bg-primary text-white text-xl font-semibold px-4 py-1 rounded-md">
+                          2010
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -194,18 +219,22 @@ const OurHistory = () => {
                     <div className="hidden md:block absolute left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-primary"></div>
                     <div className="md:flex items-center">
                       <div className="md:w-1/2 md:pr-12 mb-6 md:mb-0 text-right hidden md:block">
-                        <span className="inline-block bg-primary text-white text-xl font-semibold px-4 py-1 rounded-md">Hoje</span>
+                        <span className="inline-block bg-primary text-white text-xl font-semibold px-4 py-1 rounded-md">
+                          Hoje
+                        </span>
                       </div>
                       <div className="md:w-1/2 md:pl-12">
                         <Card className="overflow-hidden border-none shadow-xl hover:shadow-2xl transition-all bg-white">
                           <div className="block md:hidden text-center mt-6">
-                            <span className="inline-block bg-primary text-white text-xl font-semibold px-4 py-1 rounded-md">Hoje</span>
+                            <span className="inline-block bg-primary text-white text-xl font-semibold px-4 py-1 rounded-md">
+                              Hoje
+                            </span>
                           </div>
                           <CardContent className="p-0">
-                            <AspectRatio ratio={16/9} className="bg-muted">
-                              <img 
-                                src="/id_xaxim_1.JPG" 
-                                alt="Igreja atual" 
+                            <AspectRatio ratio={16 / 9} className="bg-muted">
+                              <img
+                                src="/id_xaxim_1.JPG"
+                                alt="Igreja atual"
                                 className="object-cover w-full h-full"
                               />
                             </AspectRatio>
@@ -215,10 +244,10 @@ const OurHistory = () => {
                                 <h3 className="text-2xl font-serif font-semibold">Igreja Atual</h3>
                               </div>
                               <p className="text-muted-foreground">
-                                Hoje, a Igreja de Deus Xaxim continua sua missão de espalhar o amor de Cristo e 
-                                servir à comunidade. Com uma congregação forte e unida, seguimos olhando para o 
-                                futuro com esperança e fé, sempre buscando novos caminhos para impactar positivamente 
-                                a vida das pessoas.
+                                Hoje, a Igreja de Deus Xaxim continua sua missão de espalhar o amor de Cristo
+                                e servir à comunidade. Com uma congregação forte e unida, seguimos olhando
+                                para o futuro com esperança e fé, sempre buscando novos caminhos para impactar
+                                positivamente a vida das pessoas.
                               </p>
                             </div>
                           </CardContent>
@@ -236,14 +265,16 @@ const OurHistory = () => {
         <section className="py-16 bg-gradient-to-br from-quaternary/10 to-quaternary/20">
           <div className="container mx-auto px-6">
             <div className="max-w-3xl mx-auto text-center mb-16">
-              <span className="inline-block py-1 px-3 rounded-full bg-primary/10 text-primary text-sm font-medium uppercase tracking-wider mb-4">Fundamentos</span>
+              <span className="inline-block py-1 px-3 rounded-full bg-primary/10 text-primary text-sm font-medium uppercase tracking-wider mb-4">
+                Fundamentos
+              </span>
               <h2 className="text-3xl md:text-4xl font-serif font-semibold mb-4">Nossos Valores</h2>
               <p className="text-muted-foreground">
                 Os princípios que guiam nossa caminhada e moldam nossa identidade como comunidade de fé.
               </p>
               <div className="h-1 w-24 bg-primary/30 rounded mx-auto mt-6"></div>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
               <Card className="bg-white overflow-hidden shadow-lg hover:shadow-xl transition-all border-none">
                 <div className="bg-gradient-to-br from-primary/5 to-primary/10 h-20 flex items-center justify-center">
@@ -256,11 +287,12 @@ const OurHistory = () => {
                 <CardContent className="p-6 text-center">
                   <h3 className="text-xl font-serif font-semibold mb-3">Fé</h3>
                   <p className="text-muted-foreground">
-                    Acreditamos na importância de uma fé viva e ativa, que se manifesta através do amor ao próximo e do serviço à comunidade.
+                    Acreditamos na importância de uma fé viva e ativa, que se manifesta através do amor ao
+                    próximo e do serviço à comunidade.
                   </p>
                 </CardContent>
               </Card>
-              
+
               <Card className="bg-white overflow-hidden shadow-lg hover:shadow-xl transition-all border-none">
                 <div className="bg-gradient-to-br from-primary/5 to-primary/10 h-20 flex items-center justify-center">
                   <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-md">
@@ -272,11 +304,12 @@ const OurHistory = () => {
                 <CardContent className="p-6 text-center">
                   <h3 className="text-xl font-serif font-semibold mb-3">Amor</h3>
                   <p className="text-muted-foreground">
-                    O amor é o centro de nossa missão. Buscamos amar a Deus sobre todas as coisas e ao próximo como a nós mesmos.
+                    O amor é o centro de nossa missão. Buscamos amar a Deus sobre todas as coisas e ao próximo
+                    como a nós mesmos.
                   </p>
                 </CardContent>
               </Card>
-              
+
               <Card className="bg-white overflow-hidden shadow-lg hover:shadow-xl transition-all border-none">
                 <div className="bg-gradient-to-br from-primary/5 to-primary/10 h-20 flex items-center justify-center">
                   <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-md">
@@ -288,7 +321,8 @@ const OurHistory = () => {
                 <CardContent className="p-6 text-center">
                   <h3 className="text-xl font-serif font-semibold mb-3">Comunidade</h3>
                   <p className="text-muted-foreground">
-                    Valorizamos o senso de comunidade e família. Juntos, crescemos, servimos e celebramos nossa jornada de fé.
+                    Valorizamos o senso de comunidade e família. Juntos, crescemos, servimos e celebramos
+                    nossa jornada de fé.
                   </p>
                 </CardContent>
               </Card>
@@ -302,16 +336,14 @@ const OurHistory = () => {
             <div className="max-w-5xl mx-auto rounded-2xl bg-white/10 backdrop-blur-sm p-8 md:p-12 shadow-lg">
               <div className="flex flex-col md:flex-row items-center justify-between">
                 <div className="mb-8 md:mb-0 md:mr-8 text-center md:text-left">
-                  <h3 className="text-2xl md:text-3xl font-serif font-semibold text-white mb-4">Venha nos Visitar</h3>
+                  <h3 className="text-2xl md:text-3xl font-serif font-semibold text-white mb-4">
+                    Venha nos Visitar
+                  </h3>
                   <p className="text-white/90">Faça parte da nossa comunidade e cresça em fé conosco.</p>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-4">
-                  <Button className="bg-white text-primary hover:bg-white/90">
-                    Horários de Culto
-                  </Button>
-                  <Button className="bg-secondary text-white hover:bg-secondary/90">
-                    Entre em Contato
-                  </Button>
+                  <Button className="bg-white text-primary hover:bg-white/90">Horários de Culto</Button>
+                  <Button className="bg-secondary text-white hover:bg-secondary/90">Entre em Contato</Button>
                 </div>
               </div>
             </div>
