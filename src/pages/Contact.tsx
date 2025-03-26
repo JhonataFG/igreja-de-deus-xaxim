@@ -29,6 +29,7 @@ const formSchema = z.object({
   email: z.string().email({
     message: "Por favor informe um e-mail válido.",
   }),
+  whatsapp: z.string().optional(),
   subject: z.string().min(5, {
     message: "O assunto deve ter pelo menos 5 caracteres.",
   }),
@@ -47,6 +48,7 @@ export default function Contact() {
     defaultValues: {
       name: "",
       email: "",
+      whatsapp: "",
       subject: "",
       message: "",
     },
@@ -62,6 +64,7 @@ export default function Contact() {
         .insert([{
           name: data.name,
           email: data.email,
+          whatsapp: data.whatsapp,
           subject: data.subject,
           message: data.message
         }]);
@@ -134,6 +137,23 @@ export default function Contact() {
                       )}
                     />
                   </div>
+                  
+                  <FormField
+                    control={form.control}
+                    name="whatsapp"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>WhatsApp</FormLabel>
+                        <FormControl>
+                          <Input placeholder="(11) 98765-4321" {...field} />
+                        </FormControl>
+                        <FormDescription>
+                          Informe seu número de WhatsApp para contato mais rápido (opcional).
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                   
                   <FormField
                     control={form.control}

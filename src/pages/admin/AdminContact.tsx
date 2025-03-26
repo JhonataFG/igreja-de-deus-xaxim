@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/AdminLayout";
 import { Button } from "@/components/ui/button";
-import { Clipboard, Check } from "lucide-react";
+import { Clipboard, Check, Phone } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
   Table,
@@ -19,6 +19,7 @@ type ContactSubmission = {
   id: string;
   name: string;
   email: string;
+  whatsapp: string | null;
   subject: string;
   message: string;
   created_at: string;
@@ -62,11 +63,11 @@ export default function AdminContact() {
     }).format(date);
   };
 
-  const copyToClipboard = (text: string) => {
+  const copyToClipboard = (text: string, type: 'email' | 'whatsapp' = 'email') => {
     navigator.clipboard.writeText(text);
     toast({
       title: "Copiado!",
-      description: "O email foi copiado para a área de transferência.",
+      description: `O ${type === 'email' ? 'email' : 'número de WhatsApp'} foi copiado para a área de transferência.`,
     });
   };
 
@@ -122,6 +123,7 @@ export default function AdminContact() {
                   <TableHead>Data</TableHead>
                   <TableHead>Nome</TableHead>
                   <TableHead>Email</TableHead>
+                  <TableHead>WhatsApp</TableHead>
                   <TableHead>Assunto</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Ações</TableHead>
@@ -141,12 +143,30 @@ export default function AdminContact() {
                           variant="ghost"
                           size="icon"
                           className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                          onClick={() => copyToClipboard(submission.email)}
+                          onClick={() => copyToClipboard(submission.email, 'email')}
                           title="Copiar email"
                         >
                           <Clipboard className="h-3.5 w-3.5" />
                         </Button>
                       </div>
+                    </TableCell>
+                    <TableCell>
+                      {submission.whatsapp ? (
+                        <div className="flex items-center gap-2">
+                          <span className="truncate max-w-32">{submission.whatsapp}</span>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={() => copyToClipboard(submission.whatsapp || '', 'whatsapp')}
+                            title="Copiar WhatsApp"
+                          >
+                            <Phone className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <span className="text-muted-foreground text-sm italic">Não informado</span>
+                      )}
                     </TableCell>
                     <TableCell>{submission.subject}</TableCell>
                     <TableCell>
@@ -190,6 +210,21 @@ export default function AdminContact() {
                     <h3 className="font-semibold text-lg">{submission.subject}</h3>
                     <div className="text-sm text-muted-foreground">
                       De: {submission.name} ({submission.email})
+                      {submission.whatsapp && (
+                        <span className="ml-2 flex items-center gap-1">
+                          <Phone className="h-3.5 w-3.5" inline="true" />
+                          {submission.whatsapp}
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 ml-1"
+                            onClick={() => copyToClipboard(submission.whatsapp || '', 'whatsapp')}
+                            title="Copiar WhatsApp"
+                          >
+                            <Clipboard className="h-3.5 w-3.5" />
+                          </Button>
+                        </span>
+                      )}
                     </div>
                   </div>
                   <div className="flex flex-col items-end gap-2">
