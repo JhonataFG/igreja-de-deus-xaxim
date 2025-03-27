@@ -20,7 +20,7 @@ const formSchema = z.object({
   title: z.string().min(3, "O título deve ter pelo menos 3 caracteres"),
   date: z.string().min(1, "A data é obrigatória"),
   time: z.string().min(1, "O horário é obrigatório"),
-  location: z.string().min(1, "O local é obrigatório"),
+  location: z.string().min(3, "O local deve ter pelo menos 3 caracteres"),
   description: z.string().min(10, "A descrição deve ter pelo menos 10 caracteres"),
   image: z.string().min(1, "A imagem é obrigatória"),
 });
@@ -61,7 +61,7 @@ const EventForm = ({ defaultValues, onSubmit, isSubmitting }: EventFormProps) =>
           )}
         />
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField
             control={form.control}
             name="date"
@@ -69,7 +69,7 @@ const EventForm = ({ defaultValues, onSubmit, isSubmitting }: EventFormProps) =>
               <FormItem>
                 <FormLabel>Data</FormLabel>
                 <FormControl>
-                  <Input placeholder="DD/MM/YYYY" {...field} />
+                  <Input type="date" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -83,7 +83,7 @@ const EventForm = ({ defaultValues, onSubmit, isSubmitting }: EventFormProps) =>
               <FormItem>
                 <FormLabel>Horário</FormLabel>
                 <FormControl>
-                  <Input placeholder="HH:MM - HH:MM" {...field} />
+                  <Input type="time" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -116,7 +116,7 @@ const EventForm = ({ defaultValues, onSubmit, isSubmitting }: EventFormProps) =>
                   value={field.value}
                   onChange={field.onChange}
                   bucketName="events"
-                  hint="Recomendado: 1200 x 800 pixels, máximo 5MB"
+                  hint="Recomendado: 1200 x 630 pixels, máximo 5MB"
                 />
               </FormControl>
               <FormMessage />
@@ -133,7 +133,7 @@ const EventForm = ({ defaultValues, onSubmit, isSubmitting }: EventFormProps) =>
               <FormControl>
                 <Textarea 
                   placeholder="Descreva o evento" 
-                  rows={5}
+                  rows={4}
                   {...field} 
                 />
               </FormControl>
