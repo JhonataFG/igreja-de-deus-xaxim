@@ -1,5 +1,4 @@
-
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,9 +16,14 @@ interface ImageUploadProps {
 }
 
 const ImageUpload = ({ value, onChange, bucketName, label = "Imagem", hint }: ImageUploadProps) => {
+  const fileInputRef = useRef(null);
   const [isUploading, setIsUploading] = useState(false);
   const [preview, setPreview] = useState<string | null>(value);
   const { toast } = useToast();
+
+  const handleButtonClick = () => {
+    fileInputRef.current.click();
+  };
 
   const handleImageUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -47,27 +51,25 @@ const ImageUpload = ({ value, onChange, bucketName, label = "Imagem", hint }: Im
 
     try {
       setIsUploading(true);
-      
+
       // Create a unique filename
       const fileExt = file.name.split(".").pop();
       const fileName = `${uuidv4()}.${fileExt}`;
-      
+
       // Upload to Supabase Storage
-      const { data, error } = await supabase.storage
-        .from(bucketName)
-        .upload(fileName, file);
-      
+      const { data, error } = await supabase.storage.from(bucketName).upload(fileName, file);
+
       if (error) throw error;
-      
+
       // Get the public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from(bucketName)
-        .getPublicUrl(fileName);
-      
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from(bucketName).getPublicUrl(fileName);
+
       // Set the image URL
       setPreview(publicUrl);
       onChange(publicUrl);
-      
+
       toast({
         title: "Upload realizado",
         description: "A imagem foi enviada com sucesso",
@@ -94,11 +96,7 @@ const ImageUpload = ({ value, onChange, bucketName, label = "Imagem", hint }: Im
       <Label>{label}</Label>
       {preview ? (
         <div className="relative">
-          <img 
-            src={preview} 
-            alt="Preview" 
-            className="w-full h-60 object-cover rounded-md"
-          />
+          <img src={preview} alt="Preview" className="w-full h-60 object-cover rounded-md" />
           <Button
             type="button"
             variant="destructive"
@@ -117,11 +115,12 @@ const ImageUpload = ({ value, onChange, bucketName, label = "Imagem", hint }: Im
             {hint && <p className="text-xs text-gray-400 mt-1">{hint}</p>}
           </div>
           <Input
+            id="image-upload"
             type="file"
             accept="image/*"
             onChange={handleImageUpload}
             className="hidden"
-            id="image-upload"
+            ref={fileInputRef}
           />
           <Label htmlFor="image-upload" className="cursor-pointer">
             <Button
@@ -129,6 +128,7 @@ const ImageUpload = ({ value, onChange, bucketName, label = "Imagem", hint }: Im
               variant="outline"
               disabled={isUploading}
               className="mt-3"
+              onClick={handleButtonClick}
             >
               {isUploading ? (
                 <>Enviando...</>
@@ -141,11 +141,7 @@ const ImageUpload = ({ value, onChange, bucketName, label = "Imagem", hint }: Im
           </Label>
         </div>
       )}
-      {value && !preview && (
-        <div className="text-sm text-muted-foreground mt-2">
-          URL: {value}
-        </div>
-      )}
+      {value && !preview && <div className="text-sm text-muted-foreground mt-2">URL: {value}</div>}
     </div>
   );
 };
