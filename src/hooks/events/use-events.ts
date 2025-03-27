@@ -70,6 +70,27 @@ export const useEvents = () => {
 
   const updateEvent = async (id: string, values: EventFormValues) => {
     try {
+      // Get the current event to check if image has changed
+      const { data: currentEvent } = await supabase
+        .from('events')
+        .select('image')
+        .eq('id', id)
+        .single();
+      
+      // If image URL has changed and it's from storage, delete the old image
+      if (currentEvent && currentEvent.image !== values.image && 
+          currentEvent.image.includes('storage.googleapis.com')) {
+        try {
+          const fileName = currentEvent.image.split('/').pop();
+          if (fileName) {
+            await supabase.storage.from('events').remove([fileName]);
+          }
+        } catch (error) {
+          console.error('Error deleting old image:', error);
+          // Continue with update even if image deletion fails
+        }
+      }
+
       const { data, error } = await supabase
         .from('events')
         .update(values)
@@ -102,6 +123,26 @@ export const useEvents = () => {
 
   const deleteEvent = async (id: string) => {
     try {
+      // First, get the event to check if it has an image from storage
+      const { data: event } = await supabase
+        .from('events')
+        .select('image')
+        .eq('id', id)
+        .single();
+      
+      // If event has a storage image, delete it
+      if (event?.image && event.image.includes('storage.googleapis.com')) {
+        try {
+          const fileName = event.image.split('/').pop();
+          if (fileName) {
+            await supabase.storage.from('events').remove([fileName]);
+          }
+        } catch (error) {
+          console.error('Error deleting event image:', error);
+          // Continue with event deletion even if image deletion fails
+        }
+      }
+
       const { error } = await supabase
         .from('events')
         .delete()

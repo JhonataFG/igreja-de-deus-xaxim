@@ -62,6 +62,27 @@ export const useCarouselOperations = () => {
 
   const updateSlide = async (id: string, values: CarouselFormValues) => {
     try {
+      // Get the current slide to check if image has changed
+      const { data: currentSlide } = await supabase
+        .from('carousel')
+        .select('image')
+        .eq('id', id)
+        .single();
+      
+      // If image URL has changed and it's from storage, delete the old image
+      if (currentSlide && currentSlide.image !== values.image && 
+          currentSlide.image.includes('storage.googleapis.com')) {
+        try {
+          const fileName = currentSlide.image.split('/').pop();
+          if (fileName) {
+            await supabase.storage.from('carousel').remove([fileName]);
+          }
+        } catch (error) {
+          console.error('Error deleting old image:', error);
+          // Continue with update even if image deletion fails
+        }
+      }
+
       const { data, error } = await supabase
         .from('carousel')
         .update(values)
@@ -93,6 +114,26 @@ export const useCarouselOperations = () => {
 
   const deleteSlide = async (id: string) => {
     try {
+      // First, get the slide to check if it has an image from storage
+      const { data: slide } = await supabase
+        .from('carousel')
+        .select('image')
+        .eq('id', id)
+        .single();
+      
+      // If slide has a storage image, delete it
+      if (slide?.image && slide.image.includes('storage.googleapis.com')) {
+        try {
+          const fileName = slide.image.split('/').pop();
+          if (fileName) {
+            await supabase.storage.from('carousel').remove([fileName]);
+          }
+        } catch (error) {
+          console.error('Error deleting slide image:', error);
+          // Continue with slide deletion even if image deletion fails
+        }
+      }
+
       const { error } = await supabase
         .from('carousel')
         .delete()

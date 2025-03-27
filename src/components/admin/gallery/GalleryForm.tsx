@@ -21,12 +21,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import ImageUpload from "@/components/admin/common/ImageUpload";
 
 const formSchema = z.object({
   title: z.string().min(3, "O título deve ter pelo menos 3 caracteres"),
   description: z.string().min(10, "A descrição deve ter pelo menos 10 caracteres"),
   category: z.string().min(1, "A categoria é obrigatória"),
-  image: z.string().url("Insira uma URL válida para a imagem"),
+  image: z.string().min(1, "A imagem é obrigatória"),
 });
 
 interface GalleryFormProps {
@@ -69,9 +70,14 @@ const GalleryForm = ({ defaultValues, onSubmit, isSubmitting, categories }: Gall
           name="image"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>URL da Imagem</FormLabel>
+              <FormLabel>Imagem</FormLabel>
               <FormControl>
-                <Input placeholder="https://exemplo.com/imagem.jpg" {...field} />
+                <ImageUpload
+                  value={field.value}
+                  onChange={field.onChange}
+                  bucketName="gallery"
+                  hint="Recomendado: 1200 x 800 pixels, máximo 5MB"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

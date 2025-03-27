@@ -70,6 +70,27 @@ export const useGallery = () => {
 
   const updateGalleryItem = async (id: string, values: GalleryFormValues) => {
     try {
+      // Get the current gallery item to check if image has changed
+      const { data: currentItem } = await supabase
+        .from('gallery')
+        .select('image')
+        .eq('id', id)
+        .single();
+      
+      // If image URL has changed and it's from storage, delete the old image
+      if (currentItem && currentItem.image !== values.image && 
+          currentItem.image.includes('storage.googleapis.com')) {
+        try {
+          const fileName = currentItem.image.split('/').pop();
+          if (fileName) {
+            await supabase.storage.from('gallery').remove([fileName]);
+          }
+        } catch (error) {
+          console.error('Error deleting old image:', error);
+          // Continue with update even if image deletion fails
+        }
+      }
+
       const { data, error } = await supabase
         .from('gallery')
         .update(values)
@@ -102,6 +123,26 @@ export const useGallery = () => {
 
   const deleteGalleryItem = async (id: string) => {
     try {
+      // First, get the gallery item to check if it has an image from storage
+      const { data: item } = await supabase
+        .from('gallery')
+        .select('image')
+        .eq('id', id)
+        .single();
+      
+      // If item has a storage image, delete it
+      if (item?.image && item.image.includes('storage.googleapis.com')) {
+        try {
+          const fileName = item.image.split('/').pop();
+          if (fileName) {
+            await supabase.storage.from('gallery').remove([fileName]);
+          }
+        } catch (error) {
+          console.error('Error deleting gallery image:', error);
+          // Continue with item deletion even if image deletion fails
+        }
+      }
+
       const { error } = await supabase
         .from('gallery')
         .delete()

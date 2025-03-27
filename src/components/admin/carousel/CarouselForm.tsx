@@ -13,6 +13,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { CarouselSlide } from "@/types/carousel";
+import ImageUpload from "@/components/admin/common/ImageUpload";
 
 // Extensão dos tipos existentes para o formulário
 export interface CarouselFormValues {
@@ -25,7 +26,7 @@ export interface CarouselFormValues {
 const formSchema = z.object({
   title: z.string().min(3, "O título deve ter pelo menos 3 caracteres"),
   subtitle: z.string().min(3, "O subtítulo deve ter pelo menos 3 caracteres"),
-  image: z.string().url("Insira uma URL válida para a imagem"),
+  image: z.string().min(1, "A imagem é obrigatória"),
   order_position: z.number().int().positive("A posição deve ser um número positivo"),
 });
 
@@ -83,9 +84,14 @@ const CarouselForm = ({ defaultValues, onSubmit, isSubmitting, maxPosition }: Ca
           name="image"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>URL da Imagem</FormLabel>
+              <FormLabel>Imagem</FormLabel>
               <FormControl>
-                <Input placeholder="https://exemplo.com/imagem.jpg" {...field} />
+                <ImageUpload
+                  value={field.value}
+                  onChange={field.onChange}
+                  bucketName="carousel"
+                  hint="Recomendado: 1920 x 1080 pixels, máximo 5MB"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
