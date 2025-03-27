@@ -50,7 +50,7 @@ const CarouselForm = ({ defaultValues, onSubmit, isSubmitting, maxPosition }: Ca
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <FormField
           control={form.control}
           name="title"
@@ -84,13 +84,14 @@ const CarouselForm = ({ defaultValues, onSubmit, isSubmitting, maxPosition }: Ca
           name="image"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Imagem</FormLabel>
+              <FormLabel>Imagem do Slide</FormLabel>
               <FormControl>
                 <ImageUpload
                   value={field.value}
                   onChange={field.onChange}
                   bucketName="carousel"
-                  hint="Recomendado: 1920 x 1080 pixels, máximo 5MB"
+                  hint="Recomendado: 1920 x 1080 pixels (16:9), máximo 5MB"
+                  label="Imagem do Carrossel"
                 />
               </FormControl>
               <FormMessage />
@@ -117,7 +118,7 @@ const CarouselForm = ({ defaultValues, onSubmit, isSubmitting, maxPosition }: Ca
           )}
         />
 
-        <Button type="submit" disabled={isSubmitting}>
+        <Button type="submit" disabled={isSubmitting} className="w-full">
           {isSubmitting ? "Salvando..." : defaultValues ? "Atualizar Slide" : "Criar Slide"}
         </Button>
       </form>

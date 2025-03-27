@@ -97,7 +97,7 @@ const ImageUpload = ({ value, onChange, bucketName, label = "Imagem", hint }: Im
           <img 
             src={preview} 
             alt="Preview" 
-            className="w-full h-48 object-cover rounded-md"
+            className="w-full h-60 object-cover rounded-md"
           />
           <Button
             type="button"
@@ -110,8 +110,8 @@ const ImageUpload = ({ value, onChange, bucketName, label = "Imagem", hint }: Im
           </Button>
         </div>
       ) : (
-        <div className="border-2 border-dashed border-gray-300 rounded-md p-6 flex flex-col items-center justify-center gap-2">
-          <Image className="h-10 w-10 text-gray-400" />
+        <div className="border-2 border-dashed border-gray-300 rounded-md p-8 flex flex-col items-center justify-center gap-2">
+          <Image className="h-12 w-12 text-gray-400" />
           <div className="text-center">
             <p className="text-sm text-gray-600">Clique para selecionar uma imagem</p>
             {hint && <p className="text-xs text-gray-400 mt-1">{hint}</p>}
@@ -128,7 +128,7 @@ const ImageUpload = ({ value, onChange, bucketName, label = "Imagem", hint }: Im
               type="button"
               variant="outline"
               disabled={isUploading}
-              className="mt-2"
+              className="mt-3"
             >
               {isUploading ? (
                 <>Enviando...</>
@@ -142,7 +142,7 @@ const ImageUpload = ({ value, onChange, bucketName, label = "Imagem", hint }: Im
         </div>
       )}
       {value && !preview && (
-        <div className="text-sm text-muted-foreground">
+        <div className="text-sm text-muted-foreground mt-2">
           URL: {value}
         </div>
       )}
