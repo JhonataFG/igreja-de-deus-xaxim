@@ -1,7 +1,7 @@
 
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Calendar, Image, Layers, LayoutDashboard, Phone, LogOut, Menu, X, UsersRound } from "lucide-react";
+import { Calendar, Image, Layers, LayoutDashboard, Phone, LogOut, Menu, X, UsersRound, UserRound } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -110,6 +110,16 @@ const AdminLayout = ({ children, title }: AdminLayoutProps) => {
                 >
                   <UsersRound className="mr-2 h-4 w-4" />
                   Presença
+                </Button>
+              </li>
+              <li>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start"
+                  onClick={() => navigate("/admin/members")}
+                >
+                  <UserRound className="mr-2 h-4 w-4" />
+                  Membros
                 </Button>
               </li>
             </ul>

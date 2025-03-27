@@ -20,6 +20,7 @@ import AdminCarousel from "./pages/admin/AdminCarousel";
 import AdminContact from "./pages/admin/AdminContact";
 import AdminPresence from "./pages/admin/AdminPresence";
 import AdminAttendance from "./pages/admin/AdminAttendance";
+import AdminMembers from "./pages/admin/AdminMembers";
 
 const queryClient = new QueryClient();
 
@@ -85,6 +86,14 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <AdminPresence />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/members" 
+            element={
+              <ProtectedRoute>
+                <AdminMembers />
               </ProtectedRoute>
             } 
           />
