@@ -4,7 +4,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash, UserRound } from "lucide-react";
 import { MemberProps } from "@/types/member";
-import { format } from "date-fns";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,6 +15,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface MemberTableProps {
   members: MemberProps[];
@@ -56,7 +56,7 @@ const MemberTable = ({ members, onEdit, onDelete }: MemberTableProps) => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Nome</TableHead>
+              <TableHead>Membro</TableHead>
               <TableHead>Telefone</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Status</TableHead>
@@ -73,7 +73,20 @@ const MemberTable = ({ members, onEdit, onDelete }: MemberTableProps) => {
             ) : (
               filteredMembers.map((member) => (
                 <TableRow key={member.id}>
-                  <TableCell className="font-medium">{member.name}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-8 w-8">
+                        {member.photo_url ? (
+                          <AvatarImage src={member.photo_url} alt={member.name} />
+                        ) : (
+                          <AvatarFallback>
+                            <UserRound className="h-4 w-4" />
+                          </AvatarFallback>
+                        )}
+                      </Avatar>
+                      <span className="font-medium">{member.name}</span>
+                    </div>
+                  </TableCell>
                   <TableCell>{member.phone || "—"}</TableCell>
                   <TableCell>{member.email || "—"}</TableCell>
                   <TableCell>

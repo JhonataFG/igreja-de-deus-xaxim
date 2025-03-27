@@ -8,6 +8,7 @@ export interface MemberProps {
   birth_date: string | null;
   status: string;
   created_at: string;
+  photo_url: string | null;
 }
 
 export interface MemberFormValues {
@@ -17,4 +18,5 @@ export interface MemberFormValues {
   address: string | null;
   birth_date: string | null;
   status: string;
+  photo_url: string | null;
 }

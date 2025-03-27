@@ -57,6 +57,27 @@ export const useMembers = () => {
   };
 
   const deleteMember = async (id: string): Promise<void> => {
+    // First, get the member to check if it has a photo
+    const { data: member } = await supabase
+      .from("members")
+      .select("photo_url")
+      .eq("id", id)
+      .single();
+
+    // If member has a photo, delete it from storage
+    if (member?.photo_url) {
+      try {
+        const fileName = member.photo_url.split('/').pop();
+        if (fileName) {
+          await supabase.storage.from('members').remove([fileName]);
+        }
+      } catch (photoError) {
+        console.error("Error deleting member photo:", photoError);
+        // Continue with member deletion even if photo deletion fails
+      }
+    }
+
+    // Delete the member from the database
     const { error } = await supabase.from("members").delete().eq("id", id);
 
     if (error) {

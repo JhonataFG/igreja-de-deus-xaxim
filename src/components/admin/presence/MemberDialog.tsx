@@ -5,9 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MemberProps, MemberFormValues } from "@/types/member";
-import { format } from "date-fns";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { UserRound, Upload } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { v4 as uuidv4 } from "uuid";
+import { useToast } from "@/hooks/use-toast";
 
 interface MemberDialogProps {
   isOpen: boolean;
@@ -17,6 +21,7 @@ interface MemberDialogProps {
 }
 
 const MemberDialog = ({ isOpen, onClose, onSave, member }: MemberDialogProps) => {
+  const { toast } = useToast();
   const [formData, setFormData] = useState<MemberFormValues>({
     name: "",
     email: null,
@@ -24,7 +29,11 @@ const MemberDialog = ({ isOpen, onClose, onSave, member }: MemberDialogProps) =>
     address: null,
     birth_date: null,
     status: "active",
+    photo_url: null,
   });
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
     if (member) {
@@ -35,7 +44,9 @@ const MemberDialog = ({ isOpen, onClose, onSave, member }: MemberDialogProps) =>
         address: member.address,
         birth_date: member.birth_date,
         status: member.status,
+        photo_url: member.photo_url,
       });
+      setPhotoPreview(member.photo_url);
     } else {
       setFormData({
         name: "",
@@ -44,7 +55,10 @@ const MemberDialog = ({ isOpen, onClose, onSave, member }: MemberDialogProps) =>
         address: null,
         birth_date: null,
         status: "active",
+        photo_url: null,
       });
+      setPhotoFile(null);
+      setPhotoPreview(null);
     }
   }, [member, isOpen]);
 
@@ -63,9 +77,77 @@ const MemberDialog = ({ isOpen, onClose, onSave, member }: MemberDialogProps) =>
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setPhotoFile(file);
+      const previewUrl = URL.createObjectURL(file);
+      setPhotoPreview(previewUrl);
+    }
+  };
+
+  const uploadPhoto = async (): Promise<string | null> => {
+    if (!photoFile) {
+      return formData.photo_url;
+    }
+
+    setIsUploading(true);
+    try {
+      const fileExt = photoFile.name.split('.').pop();
+      const fileName = `${uuidv4()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('members')
+        .upload(filePath, photoFile);
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      const { data } = supabase.storage.from('members').getPublicUrl(filePath);
+      return data.publicUrl;
+    } catch (error) {
+      console.error('Error uploading photo:', error);
+      toast({
+        title: "Erro ao fazer upload da foto",
+        description: "Não foi possível carregar a foto. Tente novamente.",
+        variant: "destructive",
+      });
+      return null;
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(formData);
+    
+    if (isUploading) return;
+
+    setIsUploading(true);
+    try {
+      // Upload photo if changed
+      const photoUrl = await uploadPhoto();
+      
+      // Update form data with new photo URL
+      const updatedData = {
+        ...formData,
+        photo_url: photoUrl,
+      };
+      
+      // Save member with updated data
+      onSave(updatedData);
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      toast({
+        title: "Erro ao salvar membro",
+        description: "Ocorreu um erro ao salvar as informações do membro.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   return (
@@ -75,6 +157,37 @@ const MemberDialog = ({ isOpen, onClose, onSave, member }: MemberDialogProps) =>
           <DialogTitle>{member ? "Editar Membro" : "Adicionar Novo Membro"}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 pt-4">
+          <div className="flex justify-center mb-4">
+            <div className="space-y-2 text-center">
+              <div className="flex justify-center">
+                <Avatar className="h-24 w-24 border-2 border-border">
+                  {photoPreview ? (
+                    <AvatarImage src={photoPreview} alt="Foto do membro" />
+                  ) : (
+                    <AvatarFallback className="bg-muted">
+                      <UserRound className="h-12 w-12 text-muted-foreground" />
+                    </AvatarFallback>
+                  )}
+                </Avatar>
+              </div>
+              <div>
+                <Label htmlFor="photo" className="cursor-pointer text-primary">
+                  <div className="flex items-center justify-center gap-1">
+                    <Upload className="h-4 w-4" />
+                    <span>{photoPreview ? "Alterar foto" : "Adicionar foto"}</span>
+                  </div>
+                </Label>
+                <Input
+                  id="photo"
+                  type="file"
+                  accept="image/*"
+                  onChange={handlePhotoChange}
+                  className="hidden"
+                />
+              </div>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="name">Nome*</Label>
@@ -142,10 +255,12 @@ const MemberDialog = ({ isOpen, onClose, onSave, member }: MemberDialogProps) =>
             </div>
           </div>
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button type="button" variant="outline" onClick={onClose} disabled={isUploading}>
               Cancelar
             </Button>
-            <Button type="submit">Salvar</Button>
+            <Button type="submit" disabled={isUploading}>
+              {isUploading ? "Salvando..." : "Salvar"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
