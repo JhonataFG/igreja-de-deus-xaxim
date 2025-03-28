@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import GalleryItem from "@/components/GalleryItem";
@@ -7,11 +8,13 @@ import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { usePublicGallery } from "@/hooks/gallery/use-public-gallery";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsList, TabsContent, TabsTrigger } from "@/components/ui/tabs";
 
 const Gallery = () => {
-  const { galleryItems, categories, loading } = usePublicGallery();
+  const { galleryItems, galleryAlbums, categories, loading, getAlbumImages, albumImages } = usePublicGallery();
   const [searchTerm, setSearchTerm] = useState("");
   const [activeCategory, setActiveCategory] = useState("Todos");
+  const [activeTab, setActiveTab] = useState("todos");
 
   const filteredItems = galleryItems.filter((item) => {
     const matchesSearch =
@@ -23,7 +26,28 @@ const Gallery = () => {
     return matchesSearch && matchesCategory;
   });
 
+  const filteredAlbums = galleryAlbums.filter((album) => {
+    const matchesSearch =
+      album.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      album.description.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesCategory = activeCategory === "Todos" || album.category === activeCategory;
+
+    return matchesSearch && matchesCategory;
+  });
+
   const allCategories = ["Todos", ...categories];
+
+  // Prefetch album images when needed
+  useEffect(() => {
+    if (activeTab === "albuns" && !loading) {
+      filteredAlbums.forEach(album => {
+        if (!albumImages[album.id]) {
+          getAlbumImages(album.id);
+        }
+      });
+    }
+  }, [activeTab, filteredAlbums, loading]);
 
   return (
     <>
@@ -75,29 +99,74 @@ const Gallery = () => {
               </div>
             </div>
 
+            <Tabs defaultValue="todos" onValueChange={setActiveTab} className="mb-8">
+              <TabsList className="w-full max-w-md mx-auto">
+                <TabsTrigger value="todos" className="flex-1">Todos</TabsTrigger>
+                <TabsTrigger value="fotos" className="flex-1">Fotos</TabsTrigger>
+                <TabsTrigger value="albuns" className="flex-1">Álbuns</TabsTrigger>
+              </TabsList>
+            </Tabs>
+
             {loading ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {[1, 2, 3, 4, 5, 6].map((item) => (
                   <Skeleton key={item} className="aspect-square rounded-xl" />
                 ))}
               </div>
-            ) : filteredItems.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredItems.map((item) => (
-                  <GalleryItem key={item.id} {...item} />
-                ))}
-              </div>
-            ) : galleryItems.length > 0 ? (
-              <div className="text-center py-12">
-                <h3 className="text-xl font-medium mb-2">Nenhuma imagem encontrada</h3>
-                <p className="text-muted-foreground">Tente outro termo de busca ou categoria</p>
-              </div>
             ) : (
-              <div className="text-center py-12">
-                <h3 className="text-xl font-medium mb-2">Não há imagens cadastradas</h3>
-                <p className="text-muted-foreground">
-                  Entre no painel administrativo para adicionar itens à galeria.
-                </p>
+              <div className="space-y-12">
+                {(activeTab === "todos" || activeTab === "albuns") && filteredAlbums.length > 0 && (
+                  <div>
+                    {activeTab === "todos" && <h2 className="text-2xl font-medium mb-6">Álbuns</h2>}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {filteredAlbums.map((album) => (
+                        <GalleryItem 
+                          key={album.id}
+                          id={album.id}
+                          image={album.cover_image}
+                          title={album.title}
+                          description={album.description}
+                          category={album.category}
+                          isAlbum={true}
+                          imagesCount={album.items_count}
+                          albumImages={albumImages[album.id]?.map(img => ({
+                            id: img.id,
+                            image: img.image,
+                            title: img.title
+                          }))}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {(activeTab === "todos" || activeTab === "fotos") && filteredItems.length > 0 && (
+                  <div>
+                    {activeTab === "todos" && <h2 className="text-2xl font-medium mb-6">Fotos</h2>}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {filteredItems.map((item) => (
+                        <GalleryItem key={item.id} {...item} />
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {((activeTab === "todos" && filteredItems.length === 0 && filteredAlbums.length === 0) ||
+                  (activeTab === "fotos" && filteredItems.length === 0) ||
+                  (activeTab === "albuns" && filteredAlbums.length === 0)) && (
+                  <div className="text-center py-12">
+                    <h3 className="text-xl font-medium mb-2">
+                      {galleryItems.length > 0 || galleryAlbums.length > 0
+                        ? "Nenhum resultado encontrado"
+                        : "Não há imagens cadastradas"}
+                    </h3>
+                    <p className="text-muted-foreground">
+                      {galleryItems.length > 0 || galleryAlbums.length > 0
+                        ? "Tente outro termo de busca ou categoria"
+                        : "Entre no painel administrativo para adicionar itens à galeria."}
+                    </p>
+                  </div>
+                )}
               </div>
             )}
           </div>

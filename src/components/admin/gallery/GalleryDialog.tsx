@@ -7,12 +7,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import GalleryForm from "./GalleryForm";
-import { GalleryFormValues, GalleryItem } from "@/types/gallery";
+import { GalleryFormValues, GalleryItem, GalleryAlbumFormValues } from "@/types/gallery";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface GalleryDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (values: GalleryFormValues) => Promise<boolean>;
+  onSubmit: (values: GalleryFormValues | GalleryAlbumFormValues, isAlbum: boolean) => Promise<boolean>;
   item?: GalleryItem;
   title: string;
   categories: string[];
@@ -20,10 +21,11 @@ interface GalleryDialogProps {
 
 const GalleryDialog = ({ isOpen, onOpenChange, onSubmit, item, title, categories }: GalleryDialogProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>("single");
 
-  const handleSubmit = async (values: GalleryFormValues) => {
+  const handleSubmit = async (values: GalleryFormValues | GalleryAlbumFormValues) => {
     setIsSubmitting(true);
-    const success = await onSubmit(values);
+    const success = await onSubmit(values, activeTab === "album");
     setIsSubmitting(false);
     if (success) {
       onOpenChange(false);
@@ -36,17 +38,45 @@ const GalleryDialog = ({ isOpen, onOpenChange, onSubmit, item, title, categories
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
-        <GalleryForm 
-          defaultValues={item ? {
-            title: item.title,
-            description: item.description,
-            category: item.category,
-            image: item.image,
-          } : undefined}
-          onSubmit={handleSubmit}
-          isSubmitting={isSubmitting}
-          categories={categories}
-        />
+        
+        {!item && (
+          <Tabs defaultValue="single" className="w-full" onValueChange={setActiveTab}>
+            <TabsList className="grid w-full grid-cols-2 mb-4">
+              <TabsTrigger value="single">Imagem Única</TabsTrigger>
+              <TabsTrigger value="album">Álbum de Fotos</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="single">
+              <GalleryForm 
+                defaultValues={undefined}
+                onSubmit={handleSubmit}
+                isSubmitting={isSubmitting}
+                categories={categories}
+                isAlbum={false}
+              />
+            </TabsContent>
+            
+            <TabsContent value="album">
+              <GalleryForm 
+                defaultValues={undefined}
+                onSubmit={handleSubmit}
+                isSubmitting={isSubmitting}
+                categories={categories}
+                isAlbum={true}
+              />
+            </TabsContent>
+          </Tabs>
+        )}
+        
+        {item && (
+          <GalleryForm 
+            defaultValues={item}
+            onSubmit={handleSubmit}
+            isSubmitting={isSubmitting}
+            categories={categories}
+            isAlbum={false}
+          />
+        )}
       </DialogContent>
     </Dialog>
   );
