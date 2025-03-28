@@ -64,10 +64,8 @@ const GalleryForm = ({ defaultValues, onSubmit, isSubmitting, categories, isAlbu
   // Use appropriate schema based on isAlbum
   const schema = isAlbum ? albumSchema : singleImageSchema;
   
-  // Type casting to help TypeScript understand which type we're using
-  type FormValues = typeof isAlbum extends true ? GalleryAlbumFormValues : GalleryFormValues;
-  
-  const form = useForm<FormValues>({
+  // Setup form based on whether we're handling an album or single image
+  const form = useForm<any>({
     resolver: zodResolver(schema),
     defaultValues: isAlbum 
       ? {
@@ -77,16 +75,16 @@ const GalleryForm = ({ defaultValues, onSubmit, isSubmitting, categories, isAlbu
           cover_image: "",
           event_id: null,
           images: [],
-          ...defaultValues as GalleryAlbumFormValues,
-        } as FormValues
+          ...(defaultValues as GalleryAlbumFormValues),
+        }
       : {
           title: "",
           description: "",
           category: "",
           image: "",
           event_id: null,
-          ...defaultValues as GalleryFormValues,
-        } as FormValues,
+          ...(defaultValues as GalleryFormValues),
+        },
   });
 
   useEffect(() => {
@@ -122,7 +120,7 @@ const GalleryForm = ({ defaultValues, onSubmit, isSubmitting, categories, isAlbu
     setAdditionalImages(newImages);
   };
 
-  const handleFormSubmit = async (values: FormValues) => {
+  const handleFormSubmit = async (values: any) => {
     try {
       // For single image
       if (!isAlbum) {
@@ -130,9 +128,12 @@ const GalleryForm = ({ defaultValues, onSubmit, isSubmitting, categories, isAlbu
         if (imageUploadRef.current) {
           const imageUrl = await imageUploadRef.current.uploadImage();
           if (imageUrl) {
-            (values as GalleryFormValues).image = imageUrl;
+            values.image = imageUrl;
           }
         }
+        
+        // Submit as GalleryFormValues
+        onSubmit(values as GalleryFormValues);
       } 
       // For album
       else {
@@ -146,16 +147,16 @@ const GalleryForm = ({ defaultValues, onSubmit, isSubmitting, categories, isAlbu
         if (coverImageUploadRef.current) {
           const coverImageUrl = await coverImageUploadRef.current.uploadImage();
           if (coverImageUrl) {
-            (values as GalleryAlbumFormValues).cover_image = coverImageUrl;
+            values.cover_image = coverImageUrl;
           }
         }
         
         // Add images to form values
-        (values as GalleryAlbumFormValues).images = additionalImages;
+        values.images = additionalImages;
+        
+        // Submit as GalleryAlbumFormValues
+        onSubmit(values as GalleryAlbumFormValues);
       }
-      
-      // Submit the form
-      onSubmit(values as GalleryFormValues | GalleryAlbumFormValues);
     } catch (error) {
       console.error("Error during form submission:", error);
     }
@@ -250,8 +251,8 @@ const GalleryForm = ({ defaultValues, onSubmit, isSubmitting, categories, isAlbu
                 <FormItem>
                   <FormLabel>Evento Relacionado (opcional)</FormLabel>
                   <Select 
-                    value={field.value || ""} 
-                    onValueChange={(value) => field.onChange(value || null)}
+                    value={field.value || "none"} 
+                    onValueChange={(value) => field.onChange(value === "none" ? null : value)}
                   >
                     <FormControl>
                       <SelectTrigger>
@@ -259,7 +260,7 @@ const GalleryForm = ({ defaultValues, onSubmit, isSubmitting, categories, isAlbu
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="">Nenhum evento</SelectItem>
+                      <SelectItem value="none">Nenhum evento</SelectItem>
                       {events.map(event => (
                         <SelectItem key={event.id} value={event.id}>
                           {event.title}
@@ -441,8 +442,8 @@ const GalleryForm = ({ defaultValues, onSubmit, isSubmitting, categories, isAlbu
               <FormItem>
                 <FormLabel>Evento Relacionado (opcional)</FormLabel>
                 <Select 
-                  value={field.value || ""} 
-                  onValueChange={(value) => field.onChange(value || null)}
+                  value={field.value || "none"} 
+                  onValueChange={(value) => field.onChange(value === "none" ? null : value)}
                 >
                   <FormControl>
                     <SelectTrigger>
@@ -450,7 +451,7 @@ const GalleryForm = ({ defaultValues, onSubmit, isSubmitting, categories, isAlbu
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="">Nenhum evento</SelectItem>
+                    <SelectItem value="none">Nenhum evento</SelectItem>
                     {events.map(event => (
                       <SelectItem key={event.id} value={event.id}>
                         {event.title}
