@@ -1,3 +1,4 @@
+
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -58,11 +59,13 @@ const GalleryForm = ({ defaultValues, onSubmit, isSubmitting, categories, isAlbu
   const [additionalImages, setAdditionalImages] = useState<string[]>([]);
   const [tempImage, setTempImage] = useState<string | null>(null);
   const { events, loading: eventsLoading } = useEvents();
+  const [imagesError, setImagesError] = useState<string | null>(null);
 
   // Use appropriate schema based on isAlbum
   const schema = isAlbum ? albumSchema : singleImageSchema;
   
-  const form = useForm<GalleryFormValues | GalleryAlbumFormValues>({
+  // Type assertion to tell TypeScript which type to use
+  const form = useForm<typeof isAlbum extends true ? GalleryAlbumFormValues : GalleryFormValues>({
     resolver: zodResolver(schema),
     defaultValues: isAlbum 
       ? {
@@ -72,16 +75,16 @@ const GalleryForm = ({ defaultValues, onSubmit, isSubmitting, categories, isAlbu
           cover_image: "",
           event_id: null,
           images: [],
-          ...defaultValues,
-        } as GalleryAlbumFormValues
+          ...defaultValues as GalleryAlbumFormValues,
+        } 
       : {
           title: "",
           description: "",
           category: "",
           image: "",
           event_id: null,
-          ...defaultValues,
-        } as GalleryFormValues,
+          ...defaultValues as GalleryFormValues,
+        },
   });
 
   useEffect(() => {
@@ -90,6 +93,15 @@ const GalleryForm = ({ defaultValues, onSubmit, isSubmitting, categories, isAlbu
       setAdditionalImages(defaultValues.images);
     }
   }, [isAlbum, defaultValues]);
+
+  useEffect(() => {
+    // Validate album images whenever they change
+    if (isAlbum && additionalImages.length === 0) {
+      setImagesError("Pelo menos uma imagem deve ser adicionada ao álbum");
+    } else {
+      setImagesError(null);
+    }
+  }, [additionalImages, isAlbum]);
 
   const handleAddImage = async () => {
     if (!tempImage) return;
@@ -122,6 +134,12 @@ const GalleryForm = ({ defaultValues, onSubmit, isSubmitting, categories, isAlbu
       } 
       // For album
       else {
+        // Custom validation for album images
+        if (additionalImages.length === 0) {
+          setImagesError("Pelo menos uma imagem deve ser adicionada ao álbum");
+          return;
+        }
+        
         // Upload the cover image if needed
         if (coverImageUploadRef.current) {
           const coverImageUrl = await coverImageUploadRef.current.uploadImage();
@@ -130,29 +148,8 @@ const GalleryForm = ({ defaultValues, onSubmit, isSubmitting, categories, isAlbu
           }
         }
         
-        // Upload all additional images and update their URLs
-        const uploadedImages = await Promise.all(
-          additionalImages.map(async (image) => {
-            // If the image is already a URL (not a file), return it as is
-            if (image.startsWith('http')) {
-              return image;
-            }
-            
-            // Otherwise, create a file input and trigger the upload
-            const fileInput = document.createElement('input');
-            fileInput.type = 'file';
-            
-            // Create a new ref for this image
-            const uploadRef = { current: null } as React.MutableRefObject<ImageUploadRef | null>;
-            
-            // TODO: Implement actual upload for each image
-            // For now, just return the preview URL
-            return image;
-          })
-        );
-        
-        // Set the images array in the form values
-        (values as GalleryAlbumFormValues).images = uploadedImages;
+        // Add images to form values
+        (values as GalleryAlbumFormValues).images = additionalImages;
       }
       
       // Submit the form
@@ -340,18 +337,12 @@ const GalleryForm = ({ defaultValues, onSubmit, isSubmitting, categories, isAlbu
               </div>
             </div>
             
-            {form.formState.errors.images && (
+            {imagesError && (
               <p className="text-sm font-medium text-destructive">
-                {form.formState.errors.images.message}
+                {imagesError}
               </p>
             )}
           </div>
-
-          <input 
-            type="hidden" 
-            {...form.register("images")} 
-            value={JSON.stringify(additionalImages)} 
-          />
 
           <Button type="submit" disabled={isSubmitting || additionalImages.length === 0}>
             {isSubmitting ? "Salvando..." : "Salvar Álbum"}

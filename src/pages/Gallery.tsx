@@ -11,12 +11,20 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsContent, TabsTrigger } from "@/components/ui/tabs";
 
 const Gallery = () => {
-  const { galleryItems, galleryAlbums, categories, loading, getAlbumImages, albumImages } = usePublicGallery();
+  const { 
+    items, 
+    albums, 
+    categories, 
+    loading, 
+    fetchAlbumItems, 
+    albumImages 
+  } = usePublicGallery();
+  
   const [searchTerm, setSearchTerm] = useState("");
   const [activeCategory, setActiveCategory] = useState("Todos");
   const [activeTab, setActiveTab] = useState("todos");
 
-  const filteredItems = galleryItems.filter((item) => {
+  const filteredItems = items.filter((item) => {
     const matchesSearch =
       item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.description.toLowerCase().includes(searchTerm.toLowerCase());
@@ -26,7 +34,7 @@ const Gallery = () => {
     return matchesSearch && matchesCategory;
   });
 
-  const filteredAlbums = galleryAlbums.filter((album) => {
+  const filteredAlbums = albums.filter((album) => {
     const matchesSearch =
       album.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       album.description.toLowerCase().includes(searchTerm.toLowerCase());
@@ -43,11 +51,11 @@ const Gallery = () => {
     if (activeTab === "albuns" && !loading) {
       filteredAlbums.forEach(album => {
         if (!albumImages[album.id]) {
-          getAlbumImages(album.id);
+          fetchAlbumItems(album.id);
         }
       });
     }
-  }, [activeTab, filteredAlbums, loading]);
+  }, [activeTab, filteredAlbums, loading, fetchAlbumItems, albumImages]);
 
   return (
     <>
@@ -156,12 +164,12 @@ const Gallery = () => {
                   (activeTab === "albuns" && filteredAlbums.length === 0)) && (
                   <div className="text-center py-12">
                     <h3 className="text-xl font-medium mb-2">
-                      {galleryItems.length > 0 || galleryAlbums.length > 0
+                      {items.length > 0 || albums.length > 0
                         ? "Nenhum resultado encontrado"
                         : "Não há imagens cadastradas"}
                     </h3>
                     <p className="text-muted-foreground">
-                      {galleryItems.length > 0 || galleryAlbums.length > 0
+                      {items.length > 0 || albums.length > 0
                         ? "Tente outro termo de busca ou categoria"
                         : "Entre no painel administrativo para adicionar itens à galeria."}
                     </p>

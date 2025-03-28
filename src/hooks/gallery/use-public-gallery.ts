@@ -10,6 +10,7 @@ export const usePublicGallery = (limit?: number) => {
   const [error, setError] = useState<string | null>(null);
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [albumImages, setAlbumImages] = useState<Record<string, GalleryItem[]>>({});
 
   const fetchGallery = async () => {
     try {
@@ -33,7 +34,7 @@ export const usePublicGallery = (limit?: number) => {
         throw itemsError;
       }
 
-      // Fetch albums with count of images
+      // Fetch albums
       let albumsQuery = supabase
         .from('gallery_albums')
         .select(`
@@ -43,8 +44,7 @@ export const usePublicGallery = (limit?: number) => {
           category, 
           cover_image, 
           created_at,
-          event_id,
-          (SELECT count(*) FROM gallery WHERE album_id = gallery_albums.id) as items_count
+          event_id
         `)
         .order('created_at', { ascending: false });
       
@@ -58,13 +58,30 @@ export const usePublicGallery = (limit?: number) => {
         throw albumsError;
       }
 
+      // Fetch item counts for each album
+      const albumsWithCounts = await Promise.all(
+        (albumsData || []).map(async (album) => {
+          const { count, error: countError } = await supabase
+            .from('gallery')
+            .select('id', { count: 'exact', head: true })
+            .eq('album_id', album.id);
+          
+          if (countError) {
+            console.error('Error fetching album count:', countError);
+            return { ...album, items_count: 0 }; 
+          }
+          
+          return { ...album, items_count: count || 0 };
+        })
+      );
+
       // Set the data
       setItems(itemsData as GalleryItem[]);
-      setAlbums(albumsData as GalleryAlbum[]);
+      setAlbums(albumsWithCounts as GalleryAlbum[]);
 
       // Extract unique categories
-      const allItems = [...itemsData, ...albumsData];
-      const uniqueCategories = [...new Set(allItems.map(item => item.category))];
+      const allItems = [...(itemsData || []), ...(albumsWithCounts || [])];
+      const uniqueCategories = [...new Set(allItems.filter(item => item?.category).map(item => item.category))];
       setCategories(uniqueCategories);
     } catch (error) {
       console.error('Error fetching gallery:', error);
@@ -76,6 +93,13 @@ export const usePublicGallery = (limit?: number) => {
 
   const fetchAlbumItems = async (albumId: string) => {
     try {
+      if (albumImages[albumId]) {
+        return {
+          album: albums.find(a => a.id === albumId),
+          items: albumImages[albumId]
+        };
+      }
+
       setLoading(true);
       setError(null);
       
@@ -100,6 +124,12 @@ export const usePublicGallery = (limit?: number) => {
       if (itemsError) {
         throw itemsError;
       }
+
+      // Store the album images for future reference
+      setAlbumImages(prev => ({
+        ...prev,
+        [albumId]: albumItems as GalleryItem[]
+      }));
 
       return {
         album: albumData as GalleryAlbum,
@@ -143,6 +173,7 @@ export const usePublicGallery = (limit?: number) => {
     selectedCategory,
     setSelectedCategory,
     fetchGallery,
-    fetchAlbumItems
+    fetchAlbumItems,
+    albumImages
   };
 };

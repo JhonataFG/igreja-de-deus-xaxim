@@ -39,8 +39,7 @@ export const useGallery = () => {
           category, 
           cover_image, 
           created_at,
-          event_id,
-          (SELECT count(*) FROM gallery WHERE album_id = gallery_albums.id) as items_count
+          event_id
         `)
         .order('created_at', { ascending: false });
 
@@ -48,17 +47,34 @@ export const useGallery = () => {
         throw albumsError;
       }
 
+      // Fetch item counts for each album
+      const albumsWithCounts = await Promise.all(
+        (albumsData || []).map(async (album) => {
+          const { count, error: countError } = await supabase
+            .from('gallery')
+            .select('id', { count: 'exact', head: true })
+            .eq('album_id', album.id);
+          
+          if (countError) {
+            console.error('Error fetching album count:', countError);
+            return { ...album, items_count: 0 }; 
+          }
+          
+          return { ...album, items_count: count || 0 };
+        })
+      );
+
       if (galleryData) {
         setItems(galleryData as GalleryItem[]);
       }
 
       if (albumsData) {
-        setAlbums(albumsData as GalleryAlbum[]);
+        setAlbums(albumsWithCounts as GalleryAlbum[]);
       }
 
       // Extract unique categories
-      const allItems = [...galleryData, ...albumsData];
-      const uniqueCategories = [...new Set(allItems.map(item => item.category))];
+      const allItems = [...(galleryData || []), ...(albumsWithCounts || [])];
+      const uniqueCategories = [...new Set(allItems.filter(item => item?.category).map(item => item.category))];
       setCategories(uniqueCategories);
     } catch (error) {
       console.error('Error fetching gallery items:', error);

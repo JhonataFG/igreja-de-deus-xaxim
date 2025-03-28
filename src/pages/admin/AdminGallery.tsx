@@ -27,12 +27,14 @@ const AdminGallery = () => {
     loading,
     searchTerm,
     setSearchTerm,
-    filteredGalleryItems,
-    filteredGalleryAlbums,
+    filteredItems: filteredGalleryItems,
+    filteredAlbums: filteredGalleryAlbums,
     categories,
-    createGalleryItem,
-    updateGalleryItem,
-    deleteGalleryItem
+    createItem: createGalleryItem,
+    updateItem: updateGalleryItem,
+    deleteItem: deleteGalleryItem,
+    createAlbum,
+    deleteAlbum
   } = useGallery();
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -49,7 +51,13 @@ const AdminGallery = () => {
 
   const confirmDelete = async () => {
     if (itemToDelete) {
-      const success = await deleteGalleryItem(itemToDelete.id, itemToDelete.isAlbum);
+      let success;
+      if (itemToDelete.isAlbum) {
+        success = await deleteAlbum(itemToDelete.id);
+      } else {
+        success = await deleteGalleryItem(itemToDelete.id);
+      }
+      
       if (success) {
         setIsDeleteDialogOpen(false);
         setItemToDelete(null);
@@ -71,7 +79,11 @@ const AdminGallery = () => {
     if (editingItem) {
       return await updateGalleryItem(editingItem, values as GalleryFormValues);
     } else {
-      return await createGalleryItem(values, isAlbum);
+      if (isAlbum) {
+        return await createAlbum(values as GalleryAlbumFormValues);
+      } else {
+        return await createGalleryItem(values as GalleryFormValues);
+      }
     }
   };
 
