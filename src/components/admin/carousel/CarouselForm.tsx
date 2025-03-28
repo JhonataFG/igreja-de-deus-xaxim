@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/form";
 import { CarouselSlide } from "@/types/carousel";
 import ImageUpload from "@/components/admin/common/ImageUpload";
+import { useRef } from "react";
 
 // Extensão dos tipos existentes para o formulário
 export interface CarouselFormValues {
@@ -38,6 +39,7 @@ interface CarouselFormProps {
 }
 
 const CarouselForm = ({ defaultValues, onSubmit, isSubmitting, maxPosition }: CarouselFormProps) => {
+  const imageUploadRef = useRef<{ uploadImage: () => Promise<string | null> }>(null);
   const form = useForm<CarouselFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: defaultValues || {
@@ -48,9 +50,26 @@ const CarouselForm = ({ defaultValues, onSubmit, isSubmitting, maxPosition }: Ca
     },
   });
 
+  const handleSubmit = async (values: CarouselFormValues) => {
+    try {
+      // Upload the image first if there's a pending upload
+      if (imageUploadRef.current) {
+        const imageUrl = await imageUploadRef.current.uploadImage();
+        if (imageUrl) {
+          values.image = imageUrl;
+        }
+      }
+      
+      // Then submit the form with the updated image URL
+      onSubmit(values);
+    } catch (error) {
+      console.error("Error during form submission:", error);
+    }
+  };
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
         <FormField
           control={form.control}
           name="title"
@@ -88,10 +107,14 @@ const CarouselForm = ({ defaultValues, onSubmit, isSubmitting, maxPosition }: Ca
               <FormControl>
                 <ImageUpload
                   value={field.value}
-                  onChange={field.onChange}
+                  onChange={(url, file) => {
+                    field.onChange(url || ""); // Only update the form with a URL if in preview mode
+                  }}
                   bucketName="carousel"
                   hint="Recomendado: 1920 x 1080 pixels (16:9), máximo 5MB"
                   label="Imagem do Carrossel"
+                  previewMode={true}
+                  ref={imageUploadRef}
                 />
               </FormControl>
               <FormMessage />

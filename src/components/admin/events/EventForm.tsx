@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/form";
 import { EventFormValues } from "@/types/event";
 import ImageUpload from "@/components/admin/common/ImageUpload";
+import { useRef } from "react";
 
 const formSchema = z.object({
   title: z.string().min(3, "O título deve ter pelo menos 3 caracteres"),
@@ -32,6 +33,8 @@ interface EventFormProps {
 }
 
 const EventForm = ({ defaultValues, onSubmit, isSubmitting }: EventFormProps) => {
+  const imageUploadRef = useRef<{ uploadImage: () => Promise<string | null> }>(null);
+  
   const form = useForm<EventFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: defaultValues || {
@@ -44,9 +47,26 @@ const EventForm = ({ defaultValues, onSubmit, isSubmitting }: EventFormProps) =>
     },
   });
 
+  const handleSubmit = async (values: EventFormValues) => {
+    try {
+      // Upload the image first if there's a pending upload
+      if (imageUploadRef.current) {
+        const imageUrl = await imageUploadRef.current.uploadImage();
+        if (imageUrl) {
+          values.image = imageUrl;
+        }
+      }
+      
+      // Then submit the form with the updated image URL
+      onSubmit(values);
+    } catch (error) {
+      console.error("Error during form submission:", error);
+    }
+  };
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
         <FormField
           control={form.control}
           name="title"
@@ -114,9 +134,13 @@ const EventForm = ({ defaultValues, onSubmit, isSubmitting }: EventFormProps) =>
               <FormControl>
                 <ImageUpload
                   value={field.value}
-                  onChange={field.onChange}
+                  onChange={(url, file) => {
+                    field.onChange(url || ""); // Only update the form with a URL if in preview mode
+                  }}
                   bucketName="events"
                   hint="Recomendado: 1200 x 630 pixels, máximo 5MB"
+                  previewMode={true}
+                  ref={imageUploadRef}
                 />
               </FormControl>
               <FormMessage />
