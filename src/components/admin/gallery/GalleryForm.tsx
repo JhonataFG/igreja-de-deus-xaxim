@@ -64,8 +64,10 @@ const GalleryForm = ({ defaultValues, onSubmit, isSubmitting, categories, isAlbu
   // Use appropriate schema based on isAlbum
   const schema = isAlbum ? albumSchema : singleImageSchema;
   
-  // Type assertion to tell TypeScript which type to use
-  const form = useForm<typeof isAlbum extends true ? GalleryAlbumFormValues : GalleryFormValues>({
+  // Type casting to help TypeScript understand which type we're using
+  type FormValues = typeof isAlbum extends true ? GalleryAlbumFormValues : GalleryFormValues;
+  
+  const form = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: isAlbum 
       ? {
@@ -76,7 +78,7 @@ const GalleryForm = ({ defaultValues, onSubmit, isSubmitting, categories, isAlbu
           event_id: null,
           images: [],
           ...defaultValues as GalleryAlbumFormValues,
-        } 
+        } as FormValues
       : {
           title: "",
           description: "",
@@ -84,7 +86,7 @@ const GalleryForm = ({ defaultValues, onSubmit, isSubmitting, categories, isAlbu
           image: "",
           event_id: null,
           ...defaultValues as GalleryFormValues,
-        },
+        } as FormValues,
   });
 
   useEffect(() => {
@@ -120,7 +122,7 @@ const GalleryForm = ({ defaultValues, onSubmit, isSubmitting, categories, isAlbu
     setAdditionalImages(newImages);
   };
 
-  const handleFormSubmit = async (values: GalleryFormValues | GalleryAlbumFormValues) => {
+  const handleFormSubmit = async (values: FormValues) => {
     try {
       // For single image
       if (!isAlbum) {
@@ -153,7 +155,7 @@ const GalleryForm = ({ defaultValues, onSubmit, isSubmitting, categories, isAlbu
       }
       
       // Submit the form
-      onSubmit(values);
+      onSubmit(values as GalleryFormValues | GalleryAlbumFormValues);
     } catch (error) {
       console.error("Error during form submission:", error);
     }
@@ -475,6 +477,7 @@ const GalleryForm = ({ defaultValues, onSubmit, isSubmitting, categories, isAlbu
                     field.onChange(url || "");
                   }}
                   bucketName="gallery"
+                  label="Imagem"
                   hint="Recomendado: 1200 x 800 pixels, máximo 5MB"
                   previewMode={true}
                   ref={imageUploadRef}

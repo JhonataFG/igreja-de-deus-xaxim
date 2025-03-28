@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { GalleryItem, GalleryFormValues, GalleryAlbum, GalleryAlbumFormValues } from "@/types/gallery";
-import { v4 as uuidv4 } from "uuid";
 
 export const useGallery = () => {
   const [items, setItems] = useState<GalleryItem[]>([]);
@@ -74,7 +73,9 @@ export const useGallery = () => {
 
       // Extract unique categories
       const allItems = [...(galleryData || []), ...(albumsWithCounts || [])];
-      const uniqueCategories = [...new Set(allItems.filter(item => item?.category).map(item => item.category))];
+      const uniqueCategories = [...new Set(allItems
+        .filter(item => item && item.category)
+        .map(item => item.category))];
       setCategories(uniqueCategories);
     } catch (error) {
       console.error('Error fetching gallery items:', error);

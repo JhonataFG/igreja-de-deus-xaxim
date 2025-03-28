@@ -27,12 +27,12 @@ const AdminGallery = () => {
     loading,
     searchTerm,
     setSearchTerm,
-    filteredItems: filteredGalleryItems,
-    filteredAlbums: filteredGalleryAlbums,
+    filteredItems,
+    filteredAlbums,
     categories,
-    createItem: createGalleryItem,
-    updateItem: updateGalleryItem,
-    deleteItem: deleteGalleryItem,
+    createItem,
+    updateItem,
+    deleteItem,
     createAlbum,
     deleteAlbum
   } = useGallery();
@@ -55,7 +55,7 @@ const AdminGallery = () => {
       if (itemToDelete.isAlbum) {
         success = await deleteAlbum(itemToDelete.id);
       } else {
-        success = await deleteGalleryItem(itemToDelete.id);
+        success = await deleteItem(itemToDelete.id);
       }
       
       if (success) {
@@ -77,12 +77,12 @@ const AdminGallery = () => {
 
   const handleGallerySubmit = async (values: GalleryFormValues | GalleryAlbumFormValues, isAlbum: boolean) => {
     if (editingItem) {
-      return await updateGalleryItem(editingItem, values as GalleryFormValues);
+      return await updateItem(editingItem, values as GalleryFormValues);
     } else {
       if (isAlbum) {
         return await createAlbum(values as GalleryAlbumFormValues);
       } else {
-        return await createGalleryItem(values as GalleryFormValues);
+        return await createItem(values as GalleryFormValues);
       }
     }
   };
@@ -120,8 +120,8 @@ const AdminGallery = () => {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredGalleryItems.length > 0 ? (
-                    filteredGalleryItems.map((item) => (
+                  {filteredItems.length > 0 ? (
+                    filteredItems.map((item) => (
                       <div key={item.id} className="relative group overflow-hidden rounded-lg border bg-card shadow-sm">
                         <div className="aspect-square overflow-hidden">
                           <img 
@@ -185,8 +185,8 @@ const AdminGallery = () => {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredGalleryAlbums.length > 0 ? (
-                    filteredGalleryAlbums.map((album) => (
+                  {filteredAlbums.length > 0 ? (
+                    filteredAlbums.map((album) => (
                       <div key={album.id} className="relative group overflow-hidden rounded-lg border bg-card shadow-sm">
                         <div className="aspect-video overflow-hidden">
                           <img 
@@ -263,7 +263,7 @@ const AdminGallery = () => {
         isOpen={isGalleryDialogOpen}
         onOpenChange={setIsGalleryDialogOpen}
         onSubmit={handleGallerySubmit}
-        item={editingItem ? filteredGalleryItems.find(i => i.id === editingItem) : undefined}
+        item={editingItem ? filteredItems.find(i => i.id === editingItem) : undefined}
         title={editingItem ? "Editar Imagem" : "Nova Imagem / Álbum"}
         categories={categories}
       />

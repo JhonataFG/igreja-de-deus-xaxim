@@ -81,7 +81,9 @@ export const usePublicGallery = (limit?: number) => {
 
       // Extract unique categories
       const allItems = [...(itemsData || []), ...(albumsWithCounts || [])];
-      const uniqueCategories = [...new Set(allItems.filter(item => item?.category).map(item => item.category))];
+      const uniqueCategories = [...new Set(allItems
+        .filter(item => item && item.category)
+        .map(item => item.category))];
       setCategories(uniqueCategories);
     } catch (error) {
       console.error('Error fetching gallery:', error);
