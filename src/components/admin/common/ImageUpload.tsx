@@ -180,7 +180,7 @@ const ImageUpload = ({
       {value && !preview && <div className="text-sm text-muted-foreground mt-2">URL: {value}</div>}
       
       {/* Expose the upload function */}
-      {(ImageUpload as any).uploadImage = uploadImage;
+      (ImageUpload as any).uploadImage = uploadImage;
     </div>
   );
 };
