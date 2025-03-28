@@ -149,7 +149,7 @@ const AdminGallery = () => {
                           <Button 
                             variant="secondary" 
                             size="icon" 
-                            className="h-8 w-8 rounded-full bg-white/80 backdrop-blur-sm shadow-sm"
+                            className="h-8 w-8 rounded-full bg-white/80 backdrop-blur-sm shadow-sm text-black"
                             onClick={() => handleEditClick(item.id)}
                           >
                             <Edit className="h-4 w-4" />
