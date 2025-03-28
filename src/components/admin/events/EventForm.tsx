@@ -134,7 +134,7 @@ const EventForm = ({ defaultValues, onSubmit, isSubmitting }: EventFormProps) =>
               <FormControl>
                 <ImageUpload
                   value={field.value}
-                  onChange={(url, file) => {
+                  onChange={(url) => {
                     field.onChange(url || ""); // Only update the form with a URL if in preview mode
                   }}
                   bucketName="events"

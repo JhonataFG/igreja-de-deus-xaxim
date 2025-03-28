@@ -104,30 +104,89 @@ export type Database = {
       }
       gallery: {
         Row: {
+          album_id: string | null
           category: string
           created_at: string
           description: string
+          event_id: string | null
           id: string
           image: string
           title: string
         }
         Insert: {
+          album_id?: string | null
           category: string
           created_at?: string
           description: string
+          event_id?: string | null
           id?: string
           image: string
           title: string
         }
         Update: {
+          album_id?: string | null
           category?: string
           created_at?: string
           description?: string
+          event_id?: string | null
           id?: string
           image?: string
           title?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "gallery_album_id_fkey"
+            columns: ["album_id"]
+            isOneToOne: false
+            referencedRelation: "gallery_albums"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gallery_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gallery_albums: {
+        Row: {
+          category: string
+          cover_image: string
+          created_at: string
+          description: string
+          event_id: string | null
+          id: string
+          title: string
+        }
+        Insert: {
+          category: string
+          cover_image: string
+          created_at?: string
+          description: string
+          event_id?: string | null
+          id?: string
+          title: string
+        }
+        Update: {
+          category?: string
+          cover_image?: string
+          created_at?: string
+          description?: string
+          event_id?: string | null
+          id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gallery_albums_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       member_attendance: {
         Row: {

@@ -3,112 +3,146 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { GalleryItem, GalleryAlbum } from "@/types/gallery";
 
-export const usePublicGallery = () => {
-  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
-  const [galleryAlbums, setGalleryAlbums] = useState<GalleryAlbum[]>([]);
-  const [albumImages, setAlbumImages] = useState<{[key: string]: GalleryItem[]}>({});
+export const usePublicGallery = (limit?: number) => {
+  const [items, setItems] = useState<GalleryItem[]>([]);
+  const [albums, setAlbums] = useState<GalleryAlbum[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [categories, setCategories] = useState<string[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
-  useEffect(() => {
-    const fetchGallery = async () => {
-      try {
-        setLoading(true);
-        
-        // Fetch single images (where album_id is null)
-        const { data: images, error: imagesError } = await supabase
-          .from('gallery')
-          .select('*')
-          .is('album_id', null)
-          .order('created_at', { ascending: false });
-        
-        if (imagesError) throw imagesError;
-        
-        // Fetch albums
-        const { data: albums, error: albumsError } = await supabase
-          .from('gallery_albums')
-          .select('*, items_count:gallery(count)')
-          .order('created_at', { ascending: false });
-        
-        if (albumsError) throw albumsError;
-        
-        // Process data
-        const processedAlbums = albums.map(album => ({
-          ...album,
-          items_count: (album.items_count as any)?.count || 0
-        }));
-        
-        // Extract categories
-        const allCategories = new Set<string>();
-        
-        if (images) {
-          images.forEach(item => {
-            if (item.category) allCategories.add(item.category);
-          });
-          setGalleryItems(images as GalleryItem[]);
-        }
-        
-        if (processedAlbums) {
-          processedAlbums.forEach(album => {
-            if (album.category) allCategories.add(album.category);
-          });
-          setGalleryAlbums(processedAlbums as GalleryAlbum[]);
-          
-          // Pre-fetch album images for the first few albums
-          for (const album of processedAlbums.slice(0, 3)) {
-            fetchAlbumImages(album.id);
-          }
-        }
-        
-        setCategories(Array.from(allCategories));
-      } catch (error) {
-        console.error("Error fetching gallery:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchGallery();
-  }, []);
-
-  const fetchAlbumImages = async (albumId: string) => {
+  const fetchGallery = async () => {
     try {
-      const { data, error } = await supabase
+      setLoading(true);
+      setError(null);
+      
+      // Fetch individual gallery items (not in albums)
+      let itemsQuery = supabase
+        .from('gallery')
+        .select('*')
+        .is('album_id', null)
+        .order('created_at', { ascending: false });
+      
+      if (limit) {
+        itemsQuery = itemsQuery.limit(limit);
+      }
+
+      const { data: itemsData, error: itemsError } = await itemsQuery;
+
+      if (itemsError) {
+        throw itemsError;
+      }
+
+      // Fetch albums with count of images
+      let albumsQuery = supabase
+        .from('gallery_albums')
+        .select(`
+          id, 
+          title, 
+          description, 
+          category, 
+          cover_image, 
+          created_at,
+          event_id,
+          (SELECT count(*) FROM gallery WHERE album_id = gallery_albums.id) as items_count
+        `)
+        .order('created_at', { ascending: false });
+      
+      if (limit) {
+        albumsQuery = albumsQuery.limit(limit);
+      }
+
+      const { data: albumsData, error: albumsError } = await albumsQuery;
+
+      if (albumsError) {
+        throw albumsError;
+      }
+
+      // Set the data
+      setItems(itemsData as GalleryItem[]);
+      setAlbums(albumsData as GalleryAlbum[]);
+
+      // Extract unique categories
+      const allItems = [...itemsData, ...albumsData];
+      const uniqueCategories = [...new Set(allItems.map(item => item.category))];
+      setCategories(uniqueCategories);
+    } catch (error) {
+      console.error('Error fetching gallery:', error);
+      setError('Não foi possível carregar a galeria.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchAlbumItems = async (albumId: string) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // Fetch album details
+      const { data: albumData, error: albumError } = await supabase
+        .from('gallery_albums')
+        .select('*')
+        .eq('id', albumId)
+        .single();
+
+      if (albumError) {
+        throw albumError;
+      }
+
+      // Fetch items in the album
+      const { data: albumItems, error: itemsError } = await supabase
         .from('gallery')
         .select('*')
         .eq('album_id', albumId)
         .order('created_at', { ascending: false });
-      
-      if (error) throw error;
-      
-      if (data) {
-        setAlbumImages(prev => ({
-          ...prev,
-          [albumId]: data as GalleryItem[]
-        }));
+
+      if (itemsError) {
+        throw itemsError;
       }
-      
-      return data as GalleryItem[];
+
+      return {
+        album: albumData as GalleryAlbum,
+        items: albumItems as GalleryItem[]
+      };
     } catch (error) {
-      console.error(`Error fetching album images for album ${albumId}:`, error);
-      return [];
+      console.error('Error fetching album items:', error);
+      setError('Não foi possível carregar os itens do álbum.');
+      return null;
+    } finally {
+      setLoading(false);
     }
   };
 
-  const getAlbumImages = async (albumId: string) => {
-    if (albumImages[albumId]) {
-      return albumImages[albumId];
+  const getFilteredItems = () => {
+    if (selectedCategory === "all") {
+      return items;
     }
-    
-    return await fetchAlbumImages(albumId);
+    return items.filter(item => item.category === selectedCategory);
   };
+
+  const getFilteredAlbums = () => {
+    if (selectedCategory === "all") {
+      return albums;
+    }
+    return albums.filter(album => album.category === selectedCategory);
+  };
+
+  useEffect(() => {
+    fetchGallery();
+  }, [limit]);
 
   return {
-    galleryItems,
-    galleryAlbums,
+    items: getFilteredItems(),
+    albums: getFilteredAlbums(),
+    allItems: items,
+    allAlbums: albums,
     loading,
+    error,
     categories,
-    getAlbumImages,
-    albumImages
+    selectedCategory,
+    setSelectedCategory,
+    fetchGallery,
+    fetchAlbumItems
   };
 };

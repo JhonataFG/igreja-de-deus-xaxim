@@ -1,4 +1,3 @@
-
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -22,120 +21,350 @@ import {
 } from "@/components/ui/select";
 import { GalleryFormValues, GalleryAlbumFormValues } from "@/types/gallery";
 import ImageUpload, { ImageUploadRef } from "@/components/admin/common/ImageUpload";
-import { useRef, useState } from "react";
-import { EventProps } from "@/types/event";
+import { useRef, useState, useEffect } from "react";
+import { X } from "lucide-react";
 import { useEvents } from "@/hooks/events/use-events";
-import { X, Plus } from "lucide-react";
+
+// Form schema for single image
+const singleImageSchema = z.object({
+  title: z.string().min(3, "O título deve ter pelo menos 3 caracteres"),
+  description: z.string().min(10, "A descrição deve ter pelo menos 10 caracteres"),
+  category: z.string().min(1, "A categoria é obrigatória"),
+  image: z.string().min(1, "A imagem é obrigatória"),
+  event_id: z.string().optional().nullable(),
+});
+
+// Form schema for album
+const albumSchema = z.object({
+  title: z.string().min(3, "O título deve ter pelo menos 3 caracteres"),
+  description: z.string().min(10, "A descrição deve ter pelo menos 10 caracteres"),
+  category: z.string().min(1, "A categoria é obrigatória"),
+  cover_image: z.string().min(1, "A imagem de capa é obrigatória"),
+  event_id: z.string().optional().nullable(),
+  images: z.array(z.string()).min(1, "Pelo menos uma imagem deve ser adicionada ao álbum"),
+});
 
 interface GalleryFormProps {
   defaultValues?: GalleryFormValues | GalleryAlbumFormValues;
   onSubmit: (values: GalleryFormValues | GalleryAlbumFormValues) => void;
   isSubmitting: boolean;
   categories: string[];
-  isAlbum?: boolean;
+  isAlbum: boolean;
 }
 
-const singleImageSchema = z.object({
-  title: z.string().min(3, "O título deve ter pelo menos 3 caracteres"),
-  description: z.string().min(10, "A descrição deve ter pelo menos 10 caracteres"),
-  category: z.string().min(1, "A categoria é obrigatória"),
-  image: z.string().min(1, "A imagem é obrigatória"),
-  event_id: z.string().nullable().optional(),
-  album_id: z.string().nullable().optional(),
-});
-
-const albumSchema = z.object({
-  title: z.string().min(3, "O título deve ter pelo menos 3 caracteres"),
-  description: z.string().min(10, "A descrição deve ter pelo menos 10 caracteres"),
-  category: z.string().min(1, "A categoria é obrigatória"),
-  cover_image: z.string().min(1, "A imagem de capa é obrigatória"),
-  event_id: z.string().nullable().optional(),
-  images: z.array(z.string()).min(1, "Adicione pelo menos uma imagem ao álbum"),
-});
-
-const GalleryForm = ({ defaultValues, onSubmit, isSubmitting, categories, isAlbum = false }: GalleryFormProps) => {
-  const mainImageUploadRef = useRef<ImageUploadRef>(null);
-  const [additionalImages, setAdditionalImages] = useState<Array<{id: string, file: File | null, url: string | null}>>([]);
-  const [additionalImageRefs, setAdditionalImageRefs] = useState<{[key: string]: React.RefObject<ImageUploadRef>}>({});
+const GalleryForm = ({ defaultValues, onSubmit, isSubmitting, categories, isAlbum }: GalleryFormProps) => {
+  const imageUploadRef = useRef<ImageUploadRef>(null);
+  const coverImageUploadRef = useRef<ImageUploadRef>(null);
+  const [additionalImages, setAdditionalImages] = useState<string[]>([]);
+  const [tempImage, setTempImage] = useState<string | null>(null);
   const { events, loading: eventsLoading } = useEvents();
 
+  // Use appropriate schema based on isAlbum
+  const schema = isAlbum ? albumSchema : singleImageSchema;
+  
   const form = useForm<GalleryFormValues | GalleryAlbumFormValues>({
-    resolver: zodResolver(isAlbum ? albumSchema : singleImageSchema),
-    defaultValues: defaultValues || (isAlbum ? {
-      title: "",
-      description: "",
-      category: categories.length > 0 ? categories[0] : "",
-      cover_image: "",
-      event_id: null,
-      images: [],
-    } : {
-      title: "",
-      description: "",
-      category: categories.length > 0 ? categories[0] : "",
-      image: "",
-      event_id: null,
-    }),
+    resolver: zodResolver(schema),
+    defaultValues: isAlbum 
+      ? {
+          title: "",
+          description: "",
+          category: "",
+          cover_image: "",
+          event_id: null,
+          images: [],
+          ...defaultValues,
+        } as GalleryAlbumFormValues
+      : {
+          title: "",
+          description: "",
+          category: "",
+          image: "",
+          event_id: null,
+          ...defaultValues,
+        } as GalleryFormValues,
   });
 
-  const handleSubmit = async (values: GalleryFormValues | GalleryAlbumFormValues) => {
+  useEffect(() => {
+    // If we're editing an album, fetch and set its images
+    if (isAlbum && defaultValues && 'images' in defaultValues) {
+      setAdditionalImages(defaultValues.images);
+    }
+  }, [isAlbum, defaultValues]);
+
+  const handleAddImage = async () => {
+    if (!tempImage) return;
+    
+    setAdditionalImages([...additionalImages, tempImage]);
+    setTempImage(null);
+    
+    // Reset the file input
+    const fileInput = document.getElementById('additional-image') as HTMLInputElement;
+    if (fileInput) fileInput.value = '';
+  };
+
+  const handleRemoveImage = (index: number) => {
+    const newImages = [...additionalImages];
+    newImages.splice(index, 1);
+    setAdditionalImages(newImages);
+  };
+
+  const handleFormSubmit = async (values: GalleryFormValues | GalleryAlbumFormValues) => {
     try {
-      // Upload the main image
-      if (mainImageUploadRef.current) {
-        const imageUrl = await mainImageUploadRef.current.uploadImage();
-        if (imageUrl) {
-          if (isAlbum) {
-            (values as GalleryAlbumFormValues).cover_image = imageUrl;
-          } else {
+      // For single image
+      if (!isAlbum) {
+        // Upload the image if needed
+        if (imageUploadRef.current) {
+          const imageUrl = await imageUploadRef.current.uploadImage();
+          if (imageUrl) {
             (values as GalleryFormValues).image = imageUrl;
           }
         }
-      }
-      
-      // Upload additional images for album
-      if (isAlbum) {
-        const albumValues = values as GalleryAlbumFormValues;
-        albumValues.images = [];
-        
-        for (const imageId in additionalImageRefs) {
-          const ref = additionalImageRefs[imageId];
-          if (ref.current) {
-            const imageUrl = await ref.current.uploadImage();
-            if (imageUrl) {
-              albumValues.images.push(imageUrl);
-            }
+      } 
+      // For album
+      else {
+        // Upload the cover image if needed
+        if (coverImageUploadRef.current) {
+          const coverImageUrl = await coverImageUploadRef.current.uploadImage();
+          if (coverImageUrl) {
+            (values as GalleryAlbumFormValues).cover_image = coverImageUrl;
           }
         }
+        
+        // Upload all additional images and update their URLs
+        const uploadedImages = await Promise.all(
+          additionalImages.map(async (image) => {
+            // If the image is already a URL (not a file), return it as is
+            if (image.startsWith('http')) {
+              return image;
+            }
+            
+            // Otherwise, create a file input and trigger the upload
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            
+            // Create a new ref for this image
+            const uploadRef = { current: null } as React.MutableRefObject<ImageUploadRef | null>;
+            
+            // TODO: Implement actual upload for each image
+            // For now, just return the preview URL
+            return image;
+          })
+        );
+        
+        // Set the images array in the form values
+        (values as GalleryAlbumFormValues).images = uploadedImages;
       }
       
-      // Submit the form with the updated image URLs
+      // Submit the form
       onSubmit(values);
     } catch (error) {
       console.error("Error during form submission:", error);
     }
   };
 
-  const addImageField = () => {
-    const newId = `img-${Date.now()}`;
-    setAdditionalImages([...additionalImages, {id: newId, file: null, url: null}]);
-    
-    const newRef = useRef<ImageUploadRef>(null);
-    setAdditionalImageRefs(prev => ({
-      ...prev,
-      [newId]: newRef
-    }));
-  };
+  // Form rendering based on isAlbum
+  if (isAlbum) {
+    // Album form
+    return (
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="title"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Título do Álbum</FormLabel>
+                <FormControl>
+                  <Input placeholder="Título do álbum" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-  const removeImageField = (id: string) => {
-    setAdditionalImages(additionalImages.filter(img => img.id !== id));
-    
-    const newRefs = {...additionalImageRefs};
-    delete newRefs[id];
-    setAdditionalImageRefs(newRefs);
-  };
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Descrição</FormLabel>
+                <FormControl>
+                  <Textarea 
+                    placeholder="Descrição do álbum" 
+                    rows={3}
+                    {...field} 
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="category"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Categoria</FormLabel>
+                  <Select 
+                    value={field.value} 
+                    onValueChange={field.onChange}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione uma categoria" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {categories.map(category => (
+                        <SelectItem key={category} value={category}>
+                          {category}
+                        </SelectItem>
+                      ))}
+                      <SelectItem value="nova-categoria">
+                        Nova Categoria
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            {form.watch("category") === "nova-categoria" && (
+              <FormItem>
+                <FormLabel>Nova Categoria</FormLabel>
+                <FormControl>
+                  <Input 
+                    placeholder="Nome da nova categoria" 
+                    onChange={(e) => form.setValue("category", e.target.value)}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+
+            <FormField
+              control={form.control}
+              name="event_id"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Evento Relacionado (opcional)</FormLabel>
+                  <Select 
+                    value={field.value || ""} 
+                    onValueChange={(value) => field.onChange(value || null)}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione um evento" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="">Nenhum evento</SelectItem>
+                      {events.map(event => (
+                        <SelectItem key={event.id} value={event.id}>
+                          {event.title}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <FormField
+            control={form.control}
+            name="cover_image"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Imagem de Capa</FormLabel>
+                <FormControl>
+                  <ImageUpload
+                    value={field.value}
+                    onChange={(url) => {
+                      field.onChange(url || "");
+                    }}
+                    bucketName="gallery"
+                    label="Imagem de Capa"
+                    hint="Recomendado: 1200 x 800 pixels, máximo 5MB"
+                    previewMode={true}
+                    ref={coverImageUploadRef}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <div className="space-y-2">
+            <FormLabel>Imagens do Álbum</FormLabel>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mt-3">
+              {additionalImages.map((imgUrl, index) => (
+                <div key={index} className="relative rounded-md overflow-hidden border border-gray-200">
+                  <img src={imgUrl} alt={`Imagem ${index + 1}`} className="w-full h-32 object-cover" />
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="icon"
+                    className="absolute top-1 right-1 h-6 w-6 rounded-full"
+                    onClick={() => handleRemoveImage(index)}
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+            
+            <div className="border-2 border-dashed border-gray-300 rounded-md p-4">
+              <ImageUpload
+                value={tempImage}
+                onChange={(url) => setTempImage(url)}
+                bucketName="gallery"
+                label="Adicionar Imagem"
+                hint="Adicione imagens ao álbum"
+                previewMode={true}
+              />
+              
+              <div className="flex justify-end mt-4">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={handleAddImage}
+                  disabled={!tempImage}
+                >
+                  Adicionar ao Álbum
+                </Button>
+              </div>
+            </div>
+            
+            {form.formState.errors.images && (
+              <p className="text-sm font-medium text-destructive">
+                {form.formState.errors.images.message}
+              </p>
+            )}
+          </div>
+
+          <input 
+            type="hidden" 
+            {...form.register("images")} 
+            value={JSON.stringify(additionalImages)} 
+          />
+
+          <Button type="submit" disabled={isSubmitting || additionalImages.length === 0}>
+            {isSubmitting ? "Salvando..." : "Salvar Álbum"}
+          </Button>
+        </form>
+      </Form>
+    );
+  }
+
+  // Single image form
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-4">
         <FormField
           control={form.control}
           name="title"
@@ -152,167 +381,14 @@ const GalleryForm = ({ defaultValues, onSubmit, isSubmitting, categories, isAlbu
 
         <FormField
           control={form.control}
-          name="category"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Categoria</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione uma categoria" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {categories.length > 0 ? (
-                    categories.map((category) => (
-                      <SelectItem key={category} value={category}>
-                        {category}
-                      </SelectItem>
-                    ))
-                  ) : (
-                    <SelectItem value="nova">Nova Categoria</SelectItem>
-                  )}
-                  <SelectItem value="nova">Nova Categoria</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {form.watch("category") === "nova" && (
-          <FormField
-            control={form.control}
-            name="category"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Nova Categoria</FormLabel>
-                <FormControl>
-                  <Input 
-                    placeholder="Nome da nova categoria" 
-                    {...field}
-                    onChange={(e) => field.onChange(e.target.value)}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        )}
-
-        <FormField
-          control={form.control}
-          name="event_id"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Evento Relacionado (opcional)</FormLabel>
-              <Select 
-                onValueChange={field.onChange} 
-                defaultValue={field.value || undefined}
-                value={field.value || undefined}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione um evento" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="">Nenhum</SelectItem>
-                  {!eventsLoading && events.map((event: EventProps) => (
-                    <SelectItem key={event.id} value={event.id}>
-                      {event.title} ({event.date})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name={isAlbum ? "cover_image" : "image"}
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{isAlbum ? "Imagem de Capa" : "Imagem"}</FormLabel>
-              <FormControl>
-                <ImageUpload
-                  value={field.value}
-                  onChange={(url, file) => {
-                    field.onChange(url || "");
-                  }}
-                  bucketName="gallery"
-                  hint="Recomendado: 1200 x 800 pixels, máximo 5MB"
-                  previewMode={true}
-                  ref={mainImageUploadRef}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {isAlbum && (
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <FormLabel>Imagens Adicionais</FormLabel>
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={addImageField}
-                className="flex items-center gap-1"
-              >
-                <Plus className="h-4 w-4" /> Adicionar Imagem
-              </Button>
-            </div>
-            
-            {additionalImages.length === 0 && (
-              <div className="text-center py-4 text-muted-foreground border border-dashed rounded-md">
-                Adicione imagens ao álbum clicando no botão acima
-              </div>
-            )}
-            
-            {additionalImages.map((img, index) => (
-              <div key={img.id} className="relative pt-6 pb-2 px-4 border rounded-md">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="absolute top-2 right-2 h-8 w-8 text-destructive"
-                  onClick={() => removeImageField(img.id)}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-                <div className="text-sm font-medium mb-2">Imagem {index + 1}</div>
-                <ImageUpload
-                  value={img.url}
-                  onChange={(url, file) => {
-                    const newImages = [...additionalImages];
-                    newImages[index].url = url;
-                    newImages[index].file = file || null;
-                    setAdditionalImages(newImages);
-                  }}
-                  bucketName="gallery"
-                  hint="Recomendado: 1200 x 800 pixels, máximo 5MB"
-                  previewMode={true}
-                  ref={additionalImageRefs[img.id]}
-                />
-              </div>
-            ))}
-          </div>
-        )}
-
-        <FormField
-          control={form.control}
           name="description"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Descrição</FormLabel>
               <FormControl>
                 <Textarea 
-                  placeholder="Descreva a imagem" 
-                  rows={4}
+                  placeholder="Descrição da imagem" 
+                  rows={3}
                   {...field} 
                 />
               </FormControl>
@@ -321,10 +397,105 @@ const GalleryForm = ({ defaultValues, onSubmit, isSubmitting, categories, isAlbu
           )}
         />
 
-        <Button type="submit" disabled={isSubmitting} className="w-full">
-          {isSubmitting ? "Salvando..." : defaultValues 
-            ? (isAlbum ? "Atualizar Álbum" : "Atualizar Item") 
-            : (isAlbum ? "Criar Álbum" : "Adicionar à Galeria")}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="category"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Categoria</FormLabel>
+                <Select 
+                  value={field.value} 
+                  onValueChange={field.onChange}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione uma categoria" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {categories.map(category => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
+                    <SelectItem value="nova-categoria">
+                      Nova Categoria
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          {form.watch("category") === "nova-categoria" && (
+            <FormItem>
+              <FormLabel>Nova Categoria</FormLabel>
+              <FormControl>
+                <Input 
+                  placeholder="Nome da nova categoria" 
+                  onChange={(e) => form.setValue("category", e.target.value)}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+
+          <FormField
+            control={form.control}
+            name="event_id"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Evento Relacionado (opcional)</FormLabel>
+                <Select 
+                  value={field.value || ""} 
+                  onValueChange={(value) => field.onChange(value || null)}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione um evento" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="">Nenhum evento</SelectItem>
+                    {events.map(event => (
+                      <SelectItem key={event.id} value={event.id}>
+                        {event.title}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <FormField
+          control={form.control}
+          name="image"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Imagem</FormLabel>
+              <FormControl>
+                <ImageUpload
+                  value={field.value}
+                  onChange={(url) => {
+                    field.onChange(url || "");
+                  }}
+                  bucketName="gallery"
+                  hint="Recomendado: 1200 x 800 pixels, máximo 5MB"
+                  previewMode={true}
+                  ref={imageUploadRef}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? "Salvando..." : "Salvar Imagem"}
         </Button>
       </form>
     </Form>

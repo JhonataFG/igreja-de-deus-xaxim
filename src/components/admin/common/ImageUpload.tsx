@@ -1,5 +1,5 @@
 
-import { ChangeEvent, useRef, useState, forwardRef, useImperativeHandle } from "react";
+import { ChangeEvent, forwardRef, useImperativeHandle, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,6 +7,10 @@ import { Image, Upload, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { v4 as uuidv4 } from "uuid";
 import { useToast } from "@/hooks/use-toast";
+
+export interface ImageUploadRef {
+  uploadImage: () => Promise<string | null>;
+}
 
 interface ImageUploadProps {
   value: string | null;
@@ -17,10 +21,6 @@ interface ImageUploadProps {
   previewMode?: boolean;
 }
 
-export interface ImageUploadRef {
-  uploadImage: () => Promise<string | null>;
-}
-
 const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(({ 
   value, 
   onChange, 
@@ -28,15 +28,62 @@ const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(({
   label = "Imagem", 
   hint,
   previewMode = false
-}, ref) => {
-  const fileInputRef = useRef(null);
+}: ImageUploadProps, ref) => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [preview, setPreview] = useState<string | null>(value);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const { toast } = useToast();
 
+  useImperativeHandle(ref, () => ({
+    uploadImage: async () => {
+      if (!selectedFile) return value; // Return existing value if no new file selected
+
+      try {
+        setIsUploading(true);
+
+        // Create a unique filename
+        const fileExt = selectedFile.name.split(".").pop();
+        const fileName = `${uuidv4()}.${fileExt}`;
+
+        // Upload to Supabase Storage
+        const { data, error } = await supabase.storage.from(bucketName).upload(fileName, selectedFile);
+
+        if (error) throw error;
+
+        // Get the public URL
+        const {
+          data: { publicUrl },
+        } = supabase.storage.from(bucketName).getPublicUrl(fileName);
+
+        // Update the preview with the real URL
+        setPreview(publicUrl);
+        
+        toast({
+          title: "Upload realizado",
+          description: "A imagem foi enviada com sucesso",
+        });
+        
+        return publicUrl;
+      } catch (error) {
+        console.error("Error uploading image:", error);
+        toast({
+          title: "Erro ao fazer upload",
+          description: "Não foi possível enviar a imagem",
+          variant: "destructive",
+        });
+        return null;
+      } finally {
+        setIsUploading(false);
+        setSelectedFile(null); // Clear the selected file after upload
+      }
+    }
+  }));
+
   const handleButtonClick = () => {
-    fileInputRef.current.click();
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
   };
 
   const handleImageSelection = (e: ChangeEvent<HTMLInputElement>) => {
@@ -72,57 +119,8 @@ const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(({
     onChange(previewMode ? objectUrl : null, file);
   };
 
-  // This function will be called by the parent component when the form is submitted
-  const uploadImage = async (): Promise<string | null> => {
-    if (!selectedFile) return value; // Return existing value if no new file selected
-
-    try {
-      setIsUploading(true);
-
-      // Create a unique filename
-      const fileExt = selectedFile.name.split(".").pop();
-      const fileName = `${uuidv4()}.${fileExt}`;
-
-      // Upload to Supabase Storage
-      const { data, error } = await supabase.storage.from(bucketName).upload(fileName, selectedFile);
-
-      if (error) throw error;
-
-      // Get the public URL
-      const {
-        data: { publicUrl },
-      } = supabase.storage.from(bucketName).getPublicUrl(fileName);
-
-      // Update the preview with the real URL
-      setPreview(publicUrl);
-      
-      toast({
-        title: "Upload realizado",
-        description: "A imagem foi enviada com sucesso",
-      });
-      
-      return publicUrl;
-    } catch (error) {
-      console.error("Error uploading image:", error);
-      toast({
-        title: "Erro ao fazer upload",
-        description: "Não foi possível enviar a imagem",
-        variant: "destructive",
-      });
-      return null;
-    } finally {
-      setIsUploading(false);
-      setSelectedFile(null); // Clear the selected file after upload
-    }
-  };
-
-  // Expose the uploadImage function via ref
-  useImperativeHandle(ref, () => ({
-    uploadImage
-  }));
-
   const handleRemoveImage = () => {
-    if (selectedFile) {
+    if (selectedFile && preview) {
       // If there's a local preview, revoke the object URL to prevent memory leaks
       URL.revokeObjectURL(preview);
     }
