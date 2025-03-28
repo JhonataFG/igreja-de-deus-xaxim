@@ -14,7 +14,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { EventFormValues } from "@/types/event";
-import ImageUpload from "@/components/admin/common/ImageUpload";
+import ImageUpload, { ImageUploadRef } from "@/components/admin/common/ImageUpload";
 import { useRef } from "react";
 
 const formSchema = z.object({
@@ -33,7 +33,7 @@ interface EventFormProps {
 }
 
 const EventForm = ({ defaultValues, onSubmit, isSubmitting }: EventFormProps) => {
-  const imageUploadRef = useRef<{ uploadImage: () => Promise<string | null> }>(null);
+  const imageUploadRef = useRef<ImageUploadRef>(null);
   
   const form = useForm<EventFormValues>({
     resolver: zodResolver(formSchema),

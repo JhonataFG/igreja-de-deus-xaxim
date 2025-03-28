@@ -1,5 +1,5 @@
 
-import { ChangeEvent, useRef, useState } from "react";
+import { ChangeEvent, useRef, useState, forwardRef, useImperativeHandle } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,14 +17,18 @@ interface ImageUploadProps {
   previewMode?: boolean;
 }
 
-const ImageUpload = ({ 
+export interface ImageUploadRef {
+  uploadImage: () => Promise<string | null>;
+}
+
+const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(({ 
   value, 
   onChange, 
   bucketName, 
   label = "Imagem", 
   hint,
   previewMode = false
-}: ImageUploadProps) => {
+}, ref) => {
   const fileInputRef = useRef(null);
   const [isUploading, setIsUploading] = useState(false);
   const [preview, setPreview] = useState<string | null>(value);
@@ -112,6 +116,11 @@ const ImageUpload = ({
     }
   };
 
+  // Expose the uploadImage function via ref
+  useImperativeHandle(ref, () => ({
+    uploadImage
+  }));
+
   const handleRemoveImage = () => {
     if (selectedFile) {
       // If there's a local preview, revoke the object URL to prevent memory leaks
@@ -178,11 +187,10 @@ const ImageUpload = ({
         </div>
       )}
       {value && !preview && <div className="text-sm text-muted-foreground mt-2">URL: {value}</div>}
-      
-      {/* Expose the upload function */}
-      (ImageUpload as any).uploadImage = uploadImage;
     </div>
   );
-};
+});
+
+ImageUpload.displayName = "ImageUpload";
 
 export default ImageUpload;
