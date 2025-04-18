@@ -222,9 +222,9 @@ export default function Contact() {
                     <div>
                       <h3 className="font-medium text-lg">Endereço</h3>
                       <p className="text-white/80 mt-1">
-                        Rua dos Fiéis, 123<br />
-                        Bairro Esperança<br />
-                        São Paulo - SP
+                        Rua Abrão Winter, 1264<br />
+                        Xaxim<br />
+                        Curitiba - PR
                       </p>
                     </div>
                   </div>
@@ -242,7 +242,7 @@ export default function Contact() {
                     <Mail className="h-6 w-6 flex-shrink-0 mt-1" />
                     <div>
                       <h3 className="font-medium text-lg">E-mail</h3>
-                      <p className="text-white/80 mt-1">contato@igrejadapaz.com</p>
+                      <p className="text-white/80 mt-1">contato@igrejadedeusxaxim.com</p>
                     </div>
                   </div>
                 </div>
@@ -254,19 +254,19 @@ export default function Contact() {
                 <div className="space-y-4">
                   <div className="flex justify-between py-2 border-b">
                     <span className="font-medium">Domingo - Culto da Família</span>
-                    <span>9:00 e 19:00</span>
+                    <span>10:00</span>
                   </div>
                   <div className="flex justify-between py-2 border-b">
                     <span className="font-medium">Quarta - Culto de Oração</span>
                     <span>19:30</span>
                   </div>
                   <div className="flex justify-between py-2 border-b">
-                    <span className="font-medium">Sexta - Culto de Jovens</span>
+                    <span className="font-medium">Sexta - Sala de Oração</span>
                     <span>20:00</span>
                   </div>
                   <div className="flex justify-between py-2">
-                    <span className="font-medium">Sábado - Escola Bíblica</span>
-                    <span>18:00</span>
+                    <span className="font-medium">Sábado - JIDX (Jovens)</span>
+                    <span>19:30</span>
                   </div>
                 </div>
               </div>
