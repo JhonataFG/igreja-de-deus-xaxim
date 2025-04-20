@@ -1,4 +1,3 @@
-
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import HeroCarousel from "@/components/HeroCarousel";
@@ -41,51 +40,65 @@ const Index = () => {
           </div>
         </section>
 
-        <section className="py-16 bg-quaternary">
-          <div className="container mx-auto px-4">
+        <section className="py-16 bg-quaternary bg-gradient-to-br from-quaternary to-primary/80 relative overflow-hidden">
+          <div className="absolute inset-0 pointer-events-none select-none">
+            <div className="w-96 h-96 rounded-full bg-white opacity-10 blur-3xl absolute -top-24 -left-24"></div>
+            <div className="w-60 h-60 rounded-full bg-primary opacity-20 blur-2xl absolute bottom-0 right-0"></div>
+          </div>
+          <div className="container mx-auto px-4 relative z-10">
             <div className="flex items-baseline justify-between mb-12">
               <div>
-                <span className="text-white text-sm font-medium uppercase tracking-wider">Agenda</span>
-                <h2 className="text-3xl text-secondary font-serif font-semibold mt-1">Próximos Eventos</h2>
+                <span className="text-white text-sm font-semibold uppercase tracking-widest opacity-80">Agenda</span>
+                <h2 className="text-4xl md:text-5xl font-serif font-extrabold mt-2 text-white drop-shadow-[0_2px_6px_rgba(79,120,147,0.4)]">Próximos Eventos</h2>
               </div>
-              <Link to="/events" className="text-white flex items-center hover:underline font-medium">
+              <Link to="/events" className="text-white flex items-center gap-1 hover:underline font-medium transition-colors duration-200 opacity-90 hover:opacity-100">
                 Ver Todos
-                <ChevronRight className="h-4 w-4 ml-1" />
+                <ChevronRight className="h-5 w-5 ml-0.5" />
               </Link>
             </div>
 
-            {loading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {[1, 2, 3].map((item) => (
-                  <div key={item} className="flex flex-col h-full rounded-xl overflow-hidden">
-                    <Skeleton className="h-48 w-full" />
-                    <div className="p-5 bg-white">
-                      <Skeleton className="h-6 w-3/4 mb-2" />
-                      <Skeleton className="h-4 w-full mb-4" />
-                      <Skeleton className="h-4 w-2/3 mb-2" />
-                      <Skeleton className="h-4 w-3/4 mb-6" />
-                      <Skeleton className="h-10 w-full" />
+            <div className="relative">
+              {loading ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {[1, 2, 3].map((item) => (
+                    <div
+                      key={item}
+                      className="flex flex-col h-full rounded-2xl overflow-hidden bg-white/80 shadow-xl animate-pulse border border-white/20"
+                    >
+                      <Skeleton className="h-48 w-full rounded-t-2xl" />
+                      <div className="p-6">
+                        <Skeleton className="h-6 w-3/4 mb-2" />
+                        <Skeleton className="h-4 w-full mb-4" />
+                        <Skeleton className="h-4 w-2/3 mb-2" />
+                        <Skeleton className="h-4 w-3/4 mb-6" />
+                        <Skeleton className="h-10 w-full" />
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            ) : events.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {events.map((event) => (
-                  <EventCard key={event.id} event={event} />
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-12 bg-white/5 rounded-lg">
-                <h3 className="text-xl font-medium mb-2 text-white">Não há eventos cadastrados</h3>
-                <p className="text-white/70">Entre no painel administrativo para adicionar eventos.</p>
-              </div>
-            )}
+                  ))}
+                </div>
+              ) : events.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {events.map((event, i) => (
+                    <div
+                      key={event.id}
+                      className="group animate-fade-in"
+                      style={{ animationDelay: `${i * 0.12}s` }}
+                    >
+                      <EventCard event={event} />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12 bg-white/10 rounded-2xl shadow-inner border-2 border-dashed border-white/30">
+                  <h3 className="text-2xl font-bold mb-2 text-white">Não há eventos cadastrados</h3>
+                  <p className="text-white/70">Entre no painel administrativo para adicionar eventos.</p>
+                </div>
+              )}
+            </div>
           </div>
         </section>
 
         <section className="py-16 bg-white">
-          {/* ...  manter o restante do código existente (seção "Como Podemos Servir Você") */}
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto text-center mb-8">
               <span className="text-primary text-sm font-medium uppercase tracking-wider">
