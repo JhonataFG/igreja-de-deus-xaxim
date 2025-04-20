@@ -1,15 +1,16 @@
+
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import HeroCarousel from "@/components/HeroCarousel";
 import EventCard from "@/components/EventCard";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Calendar, Clock, MapPin } from "lucide-react";
 import { usePublicEvents } from "@/hooks/events/use-public-events";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const Index = () => {
-  const { events, loading } = usePublicEvents(3); // Limitando a 3 eventos
+  const { events, loading } = usePublicEvents(3);
 
   return (
     <>
@@ -40,18 +41,21 @@ const Index = () => {
           </div>
         </section>
 
-        <section className="py-16 bg-quaternary bg-gradient-to-br from-quaternary to-primary/80 relative overflow-hidden">
+        {/* Agenda moderna */}
+        <section className="py-20 bg-gradient-to-br from-quaternary to-primary/80 relative overflow-hidden">
           <div className="absolute inset-0 pointer-events-none select-none">
             <div className="w-96 h-96 rounded-full bg-white opacity-10 blur-3xl absolute -top-24 -left-24"></div>
             <div className="w-60 h-60 rounded-full bg-primary opacity-20 blur-2xl absolute bottom-0 right-0"></div>
           </div>
           <div className="container mx-auto px-4 relative z-10">
-            <div className="flex items-baseline justify-between mb-12">
+            <div className="flex items-center justify-between mb-12 flex-col md:flex-row gap-6 md:gap-0">
               <div>
                 <span className="text-white text-sm font-semibold uppercase tracking-widest opacity-80">Agenda</span>
-                <h2 className="text-4xl md:text-5xl font-serif font-extrabold mt-2 text-white drop-shadow-[0_2px_6px_rgba(79,120,147,0.4)]">Próximos Eventos</h2>
+                <h2 className="text-4xl md:text-5xl font-serif font-extrabold mt-2 text-white drop-shadow-[0_2px_6px_rgba(79,120,147,0.36)]">
+                  Próximos Eventos
+                </h2>
               </div>
-              <Link to="/events" className="text-white flex items-center gap-1 hover:underline font-medium transition-colors duration-200 opacity-90 hover:opacity-100">
+              <Link to="/events" className="text-white flex items-center gap-1 hover:underline font-medium transition-colors duration-200 opacity-90 hover:opacity-100 bg-white/10 px-4 py-2 rounded-full shadow-md backdrop-blur-sm hover:bg-white/20">
                 Ver Todos
                 <ChevronRight className="h-5 w-5 ml-0.5" />
               </Link>
@@ -59,32 +63,71 @@ const Index = () => {
 
             <div className="relative">
               {loading ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                   {[1, 2, 3].map((item) => (
                     <div
                       key={item}
-                      className="flex flex-col h-full rounded-2xl overflow-hidden bg-white/80 shadow-xl animate-pulse border border-white/20"
+                      className="flex flex-col h-full rounded-3xl overflow-hidden bg-white/20 shadow-xl animate-pulse border-none backdrop-blur-lg"
                     >
-                      <Skeleton className="h-48 w-full rounded-t-2xl" />
-                      <div className="p-6">
-                        <Skeleton className="h-6 w-3/4 mb-2" />
-                        <Skeleton className="h-4 w-full mb-4" />
-                        <Skeleton className="h-4 w-2/3 mb-2" />
-                        <Skeleton className="h-4 w-3/4 mb-6" />
-                        <Skeleton className="h-10 w-full" />
+                      <Skeleton className="h-52 w-full rounded-t-3xl" />
+                      <div className="p-8">
+                        <Skeleton className="h-6 w-3/4 mb-3" />
+                        <Skeleton className="h-12 w-full mb-5" />
+                        <Skeleton className="h-4 w-2/3 mb-3" />
+                        <Skeleton className="h-4 w-3/4 mb-4" />
+                        <Skeleton className="h-10 w-1/2" />
                       </div>
                     </div>
                   ))}
                 </div>
               ) : events.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                   {events.map((event, i) => (
                     <div
                       key={event.id}
                       className="group animate-fade-in"
                       style={{ animationDelay: `${i * 0.12}s` }}
                     >
-                      <EventCard event={event} />
+                      {/* Card moderno construído aqui */}
+                      <div className="relative bg-white/80 backdro-blur-xl rounded-3xl shadow-2xl p-0 overflow-hidden flex flex-col h-full border border-white/30">
+                        <div className="relative">
+                          <img
+                            src={event.image}
+                            alt={event.title}
+                            className="w-full h-56 object-cover object-center rounded-t-3xl transition-transform duration-500 group-hover:scale-105"
+                          />
+                          <div className="absolute top-5 left-5 flex gap-2">
+                            <span className="inline-flex items-center gap-1.5 px-4 py-1 rounded-full bg-white/90 shadow text-primary/90 font-bold text-base border-2 border-primary/10 backdrop-blur-sm uppercase tracking-wider">
+                              <Calendar className="w-4 h-4 mr-1 text-primary/50" />
+                              {event.date}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex-grow flex flex-col justify-between p-7 pb-4">
+                          <div>
+                            <h3 className="text-primary font-serif font-extrabold text-2xl mb-2 leading-tight drop-shadow select-text line-clamp-2">
+                              {event.title}
+                            </h3>
+                            <p className="text-muted-foreground/90 mb-5 text-base line-clamp-3 select-text">{event.description}</p>
+                          </div>
+                          <div className="space-y-3 mb-5">
+                            <div className="flex items-center gap-2 text-primary/90">
+                              <Clock className="w-5 h-5 text-primary/60" />
+                              <span className="font-semibold text-base">{event.time}</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-primary/90">
+                              <MapPin className="w-5 h-5 text-primary/60" />
+                              <span className="font-semibold text-base">{event.location}</span>
+                            </div>
+                          </div>
+                          <Button
+                            variant="outline"
+                            className="w-full border-primary/30 text-primary font-bold rounded-full bg-white/70 hover:bg-primary hover:text-white transition-all shadow focus:ring-2 focus:ring-primary/40"
+                          >
+                            Saiba Mais
+                          </Button>
+                        </div>
+                      </div>
                     </div>
                   ))}
                 </div>
